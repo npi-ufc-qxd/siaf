@@ -39,6 +39,8 @@ public class Constants {
 	
 	public static final String REDIRECT_PAGINA_LISTAR_RESERVAS = "redirect:/reserva/listar";
 	
+	public static final String REDIRECT_PAGINA_LISTAR_PERIODOS = "redirect:/administracao/periodo";
+	
 	
 	/** Mensagens */
 	

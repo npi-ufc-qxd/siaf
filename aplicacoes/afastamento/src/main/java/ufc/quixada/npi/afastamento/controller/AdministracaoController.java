@@ -11,6 +11,9 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -126,106 +129,12 @@ public class AdministracaoController {
 	
 	@RequestMapping(value = "/periodo", method = RequestMethod.GET)
 	public String listarPeriodos(Model model) {
-		model.addAttribute("periodo", new Periodo());
+		model.addAttribute("periodos", periodoService.find(Periodo.class));
 		return Constants.PAGINA_LISTAR_PERIODOS;
 	}
 
-	@RequestMapping(value = "/periodo", method = RequestMethod.POST)
-	public String listarPeriodos(Model model, @RequestParam("ano") Integer ano, @RequestParam("semestre") Integer semestre) {
-		Periodo periodo = periodoService.getPeriodo(ano, semestre);
-		
-		if(!notNull(periodo)){
-			model.addAttribute("message", "Período " + ano + "." + semestre + " não está cadastrado.");
-			return Constants.PAGINA_LISTAR_PERIODOS;
-		} else if (periodo.getStatus().equals(StatusPeriodo.ENCERRADO)) {
-			model.addAttribute("permitirUpdate", false);
-			model.addAttribute("periodo", periodo);
-			return Constants.PAGINA_LISTAR_PERIODOS;
-		}
-
-		boolean permitirUpdateEncerramento = false;
-		boolean permitirUpdateVagas = false;
-		
-		Periodo periodoSolicitacao = periodoService.getPeriodo(periodo.getAno()-1, periodo.getSemestre());	
-
-		if(periodo.getStatus().equals(StatusPeriodo.ABERTO)){
-			permitirUpdateEncerramento = true;
-		}
-
-		if(periodoSolicitacao.getStatus().equals(StatusPeriodo.ABERTO)){
-			permitirUpdateVagas = true;
-		}
-		
-		model.addAttribute("permitirUpdateVagas", 		 permitirUpdateVagas);
-		model.addAttribute("permitirUpdateEncerramento", permitirUpdateEncerramento);
-		model.addAttribute("periodo", periodo);
-		return Constants.PAGINA_LISTAR_PERIODOS;
-	}
-	
 	private boolean notNull(Object object){
 		return object != null ?  true : false;
-	}
-	
-	@RequestMapping(value = "/update-periodo", method = RequestMethod.POST)
-	@CacheEvict(value = {"default", "reservasByProfessor", "periodo", "visualizarRanking", "ranking", "loadProfessor", "professores"}, allEntries = true)
-	public String atualizarPeriodo(Model model, RedirectAttributes redirectAttributes, @Valid @ModelAttribute("periodo") Periodo periodo, BindingResult result) {
-
-		Date encerramento = periodo.getEncerramento();
-		Integer vagas = periodo.getVagas();
-		if(encerramento != null) {
-			try {
-				SimpleDateFormat format = new SimpleDateFormat(br.ufc.quixada.npi.ldap.model.Constants.FORMATO_DATA_NASCIMENTO);
-				Date today;
-					today = format.parse(format.format(new Date()));
-				
-				if(encerramento.before(today)) {
-					model.addAttribute("periodo", periodo);
-					model.addAttribute("errorData", Constants.MSG_DATA_FUTURA);
-					return Constants.PAGINA_LISTAR_PERIODOS;
-				}
-			} catch (ParseException e) {
-				model.addAttribute("periodo", periodo);
-				model.addAttribute(Constants.ERRO, Constants.MSG_ERRO_ATUALIZAR_PERIODO);
-				return Constants.PAGINA_LISTAR_PERIODOS;
-			}
-		}
-		
-		if(vagas == null) {
-			vagas = 0;
-		}
-		
-		boolean permitirUpdateEncerramento = false;
-		boolean permitirUpdateVagas = false;
-
-		periodo = periodoService.find(Periodo.class, periodo.getId());
-
-		if(periodo.getStatus().equals(StatusPeriodo.ABERTO)){
-			permitirUpdateEncerramento = true;
-		}
-
-		Periodo periodoSolicitacao = periodoService.getPeriodo(periodo.getAno() - 1, periodo.getSemestre());	
-		if(periodoSolicitacao.getStatus().equals(StatusPeriodo.ABERTO)){
-			permitirUpdateVagas = true;
-		}
-				
-		model.addAttribute("permitirUpdateVagas", permitirUpdateVagas);
-		model.addAttribute("permitirUpdateEncerramento", permitirUpdateEncerramento);
-
-		if(permitirUpdateEncerramento){
-			periodo.setEncerramento(encerramento);
-		}
-
-		if(permitirUpdateVagas){
-			periodo.setVagas(vagas);
-		}
-			
-		if(permitirUpdateEncerramento || permitirUpdateVagas){
-			periodoService.update(periodo);
-			model.addAttribute("periodo", periodo);
-			model.addAttribute(Constants.INFO,"Período " +periodo.getAno() + "." + periodo.getSemestre() + " atualizado com sucesso.");
-		}
-		
-		return Constants.PAGINA_LISTAR_PERIODOS;
 	}
 	
 	@RequestMapping(value = "/admissao", method = RequestMethod.POST)
@@ -248,6 +157,94 @@ public class AdministracaoController {
 		model.addAttribute("info", "Data de admissão do(a) Prof(a) " + professor.getNome() + " atualizada com sucesso.");
 
 		return Constants.PAGINA_LISTAR_PROFESSORES;
+	}
+	
+	@RequestMapping(value = "/edit-periodo.json", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody Model permissaoEditPeriodo(Model model, @RequestParam("id") Long id) {
+
+		Periodo periodo = periodoService.find(Periodo.class, id);
+		boolean editEncerramento = false;
+		boolean editVagas = false;
+
+		if(periodo.getStatus().equals(StatusPeriodo.ABERTO)){
+			editEncerramento = true;
+		}
+
+		Periodo periodoSolicitacao = periodoService.getPeriodo(periodo.getAno() - 1, periodo.getSemestre());	
+		if(notNull(periodoSolicitacao))
+		if(periodoSolicitacao.getStatus().equals(StatusPeriodo.ABERTO)){
+			editVagas = true;
+		}
+
+		model.addAttribute("editEncerramento", editEncerramento);
+		model.addAttribute("editVagas", editVagas);
+
+		return model;
+	}
+
+	@RequestMapping(value = "/editar-periodo.json", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	public Model editarPeriodo(Model model, 
+			@RequestParam("id") Long id, 
+			@RequestParam("vagas") Integer vagas, 
+			@RequestParam("encerramento") String encerramentoString) {
+
+		boolean permitirUpdateEncerramento = false;
+		boolean permitirUpdateVagas = false;
+
+		Periodo periodo = periodoService.find(Periodo.class, id);
+
+		Date encerramento = null;
+
+		if(encerramentoString != null && !encerramentoString.isEmpty()) {
+			if(periodo.getStatus().equals(StatusPeriodo.ABERTO)){
+
+				try {
+					DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("dd/MM/yyyy");
+					DateTime date = dateTimeFormatter.parseDateTime(encerramentoString);
+					encerramento = date.toDate();
+
+					SimpleDateFormat format = new SimpleDateFormat(br.ufc.quixada.npi.ldap.model.Constants.FORMATO_DATA_NASCIMENTO);					
+					Date today;
+ 						today = format.parse(format.format(new Date()));
+					
+					if(encerramento.before(today)) {
+						model.addAttribute(Constants.ERRO, Constants.MSG_DATA_FUTURA);
+						model.addAttribute("periodo", periodo);
+						return model;
+					}
+
+					permitirUpdateEncerramento = true;
+				} catch (ParseException e) {
+					model.addAttribute(Constants.ERRO, Constants.MSG_ERRO_ATUALIZAR_PERIODO);
+					return model;
+				}
+			}
+		}
+	
+		if(vagas == null) {
+			vagas = 0;
+		}
+		
+		Periodo periodoSolicitacao = periodoService.getPeriodo(periodo.getAno() - 1, periodo.getSemestre());	
+		if(periodoSolicitacao.getStatus().equals(StatusPeriodo.ABERTO)){
+			permitirUpdateVagas = true;
+		}
+
+		if(permitirUpdateEncerramento){
+			periodo.setEncerramento(encerramento);
+		}
+
+		if(permitirUpdateVagas){
+			periodo.setVagas(vagas);
+		}
+			
+		if(permitirUpdateEncerramento || permitirUpdateVagas){
+			periodoService.update(periodo);
+			model.addAttribute(Constants.INFO,"Período " +periodo.getAno() + "." + periodo.getSemestre() + " atualizado com sucesso.");
+		}
+
+		model.addAttribute("periodo", periodo);
+		return model;
 	}
 	
 

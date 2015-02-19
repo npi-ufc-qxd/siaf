@@ -7,144 +7,134 @@
 
 <html>
 <head>
-	<jsp:include page="../modulos/header-estrutura.jsp" />
-	<title>Gerenciar Períodos</title>
+<jsp:include page="../modulos/header-estrutura.jsp" />
+<link href="<c:url value="/resources/css/jquery.dataTables.min.css" />" rel="stylesheet" />
+
+<title>SiAf - Período</title>
 </head>
 <body>
 	<div id="wrapper" class="container">
 		<jsp:include page="../modulos/header.jsp" />
+		
 		<div id="content">
 					
-			<div class="title"> Selecione o período : </div>
+			<div class="title"> Período : </div>
 			<span class="line"></span>
-
-			<c:if test="${not empty erro}">
-					<div class="alert alert-danger alert-dismissible margin-top" role="alert">
+ 
+			<div class="messages">
+				<div id="erro" class="alert alert-danger margin-top hide" role="alert">
 					<button type="button" class="close" data-dismiss="alert">
 						<span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
 					</button>
-					<c:out value="${erro}"></c:out>
+					<p></p>
 				</div>
-			</c:if>
 
-			<c:if test="${not empty info}">
-				<div style="" class="alert alert-info alert-dismissible margin-top" role="alert">
+				<div id="info" class="alert alert-info margin-top hide" role="alert">
 					<button type="button" class="close" data-dismiss="alert">
 						<span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
 					</button>
-					<c:out value="${info}"></c:out>
+					<p></p>
 				</div>
-			</c:if>
-			
-			<div id="filtroPeriodo">
-				<div class="col-sm-1">
-					<input id="filtroAno" name="ano" type="text" class="form-control" placeholder="ano">
-				</div>
-				<select id="filtroSemestre" name="semestre" class="selectpicker filtroSemestre" data-width="auto">
-					<option value="">Semestre</option>
-					<option value="1">1</option>
-					<option value="2">2</option>
-				</select>
-			</div>
-			
-			
-			<div id="viewPeriodo"  class="form-horizontal" align="center">
-				<c:if test="${not empty periodo}">
-					<div id="update-periodo" class="panel panel-default">
-						<div id="periodo-heading" class="panel-heading"><strong>Período: <label class="value-label">${periodo.ano }.${periodo.semestre }</label></strong></div>
-
-						<div id="periodo-body" class="panel-body">
-							<form:form id="form-periodo" commandName="periodo" action="/siaf/administracao/update-periodo" method="POST" >
-								<form:hidden id="chave" path="id"/>
-								<form:hidden id="anoHidden" path="ano"/>
-								<form:hidden id="semestre" path="semestre"/>
+			</div>			
+			<div>
+				<table id="tablePeriodos" class="display" cellspacing="0" width="100%">
+					<thead>
+						<tr>
+							<th>Status</th>
+							<th>Ano</th>
+							<th>Semestre</th>
+							<th>Encerramento</th>
+							<th>Vagas</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody id="bodyPeriodos">
+						<c:forEach items="${periodos}" var="periodo" varStatus="cont">
+							<tr id="periodo${periodo.id}">
+								<fmt:formatDate value="${periodo.encerramento}" pattern="dd/MM/yyyy" var="data"/>
+								<td><span class="label ${periodo.status eq 'ABERTO' ? 'label-success':'label-danger'}">${periodo.status}</span></td>
+								<td>${periodo.ano}</td>
+								<td>${periodo.semestre}</td>
 								
-								<div class="periodo">
-		                            <div class="form-item form-group form-inline input-periodo">
-
-										<c:if test="${permitirUpdateEncerramento}">
-											<label for="encerramento" class="control-label">Encerramento:</label>
-											<form:input id="encerramento" type="text" path="encerramento" name="encerramento" cssClass="form-control data" placeholder="dd/mm/aaaa"/>
-											<div class="error-validation">
-												<form:errors path="encerramento"></form:errors>
-												<c:out value="${errorData}"></c:out>
-											</div>
-
-										</c:if>
-
-										<c:if test="${not permitirUpdateEncerramento}">
-											<label for="encerramento" class="control-label">Encerramento: ${periodo.encerramento}</label>
-										</c:if>
-		                            </div>
-		
-		                            <div class="form-item form-group form-inline input-periodo">
-										<c:if test="${permitirUpdateVagas}">
-											<label for="vagas" class="control-label">Vagas:</label>
-											<form:input id="vagas" type="number" path="vagas" min="0" size="3" cssClass="form-control"/>
-											<div class="error-validation">
-												<form:errors path="vagas"></form:errors>
-											</div>
-										</c:if>
-
-										<c:if test="${not permitirUpdateVagas}">
-											<label for="vagas" class="control-label">Vagas: ${periodo.vagas}</label>
-										</c:if>
-		                            </div>
-								</div>
-								<div class="clear"></div>
-								<c:if test="${permitirUpdateEncerramento or permitirUpdateVagas}">
-									<div>
-										<input id="btn-update" name="atualizar" type="submit" class="btn btn-siaf" value="Atualizar" />
-									</div>
-								</c:if>
-							</form:form>
-						</div>					
-					</div>					
-				
-				</c:if>
-			
-				<c:if test="${empty periodo}">
-					<div id="update-periodo" class="alert alert-danger alert-dismissible margin-top-10" role="alert">
-						<button type="button" class="close" data-dismiss="alert">
-							<span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
-						</button>
-						<c:out value="${message}"></c:out>
-					</div>
-				</c:if>
+								<td id="encerramento${periodo.id}" class="encerramento">${data}</td>
+								<td id="vagas${periodo.id}" class="vagas">${periodo.vagas}</td>
+								
+								<td class="editPeriodo">
+									<button class="btn editPeriodo" id="editPeriodo${periodo.id}" data-id="${periodo.id}"><i class="fa fa-pencil "></i></button>
+				    	           	<div class="options hide" id="options${periodo.id}">
+						                <button class="btn salvarPeriodo btn-primary" data-id="${periodo.id}">salvar</button>
+					    	           	<button class="btn cancelPeriodo btn-danger" data-id="${periodo.id}"><i class="fa fa-times "></i></button>									
+				    	           	</div>
+								</td>
+				           </tr>
+					</c:forEach>
+					</tbody>
+				</table>
 			</div>
-		
-			<div id="listaPeriodos">
-			    <div class="panel-group" id="accordion">
-			        <div class="panel panel-default">
-			            <div class="panel-heading">
-			                <h4 class="panel-title">
-			                    <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne"><span class="glyphicon glyphicon-link"></span> Veja todos os períodos</a>
-			                </h4>
-			            </div>
-			            <div id="collapseOne" class="panel-collapse collapse">
-							<div>
-								<table id="periodos" class="table table-striped">
-									<thead>
-										<tr class="afas-tr-left">
-							               <th data-column-id="ano" data-order="asc" data-align="center" data-type="numeric">Ano</th>
-							               <th data-column-id="semestre" data-order="asc" data-align="center"  data-type="numeric">Semestre</th>
-							               <th data-column-id="vagas" data-align="center"  data-type="numeric">Vagas</th>
-							               <th data-column-id="status" data-formatter="status" data-align="center">Status</th>
-							           </tr>
-							       </thead>
-								</table>
-							</div>
-			            </div>
-			        </div>
+		</div>
+	</div>
+	
+	<div class="modal fade" id="info-periodo" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-body"><b></b></div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">fechar</button>
 				</div>
 			</div>
 		</div>
-		<jsp:include page="../modulos/footer.jsp" />
 	</div>
+	
+
+	<jsp:include page="../modulos/footer.jsp" />
+	<script src="<c:url value="/resources/js/jquery.dataTables.min.js" />"></script>
 
 	<script type="text/javascript">
 		getPeriodos();
 		$('#menu-periodos').addClass('active');
+		
+		$('#tablePeriodos').DataTable({
+			 "pageLength": 50,
+			 "order": [[ 1, 'asc' ], [ 2, 'asc' ]],
+			 "columnDefs": [
+			               { "orderable": false, "targets": 0 },
+			               { "orderData": [ 1, 2 ],    "targets": 1 },
+			               { "orderable": false, "targets": 2 },
+			               { "orderable": false, "targets": 3 },
+			               { "orderable": false, "targets": 4 },
+			               { "orderable": false, "targets": 5 },
+			],
+			
+			"language": {
+			    "sEmptyTable": "Nenhum registro encontrado",
+			    "sInfo": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+			    "sInfoEmpty": "Mostrando 0 até 0 de 0 registros",
+			    "sInfoFiltered": "(Filtrados de _MAX_ registros)",
+			    "sInfoPostFix": "",
+			    "sInfoThousands": ".",
+			    "sLengthMenu": "resultados por página _MENU_",
+			    "sLoadingRecords": "Carregando...",
+			    "sProcessing": "Processando...",
+			    "sZeroRecords": "Nenhum registro encontrado",
+			    "sSearch": "",
+			    "oPaginate": {
+			        "sNext": "Próximo",
+			        "sPrevious": "Anterior",
+			        "sFirst": "Primeiro",
+			        "sLast": "Último"
+			    },
+			    "oAria": {
+			        "sSortAscending": ": Ordenar colunas de forma ascendente",
+			        "sSortDescending": ": Ordenar colunas de forma descendente"
+			    }
+			}
+		});
+		
+		
+		$('select').selectpicker();
+		$('input').attr('placeholder', 'Pesquisar...');
+		$('input').addClass('form-inline form-control');
+	
 	</script>
 </body>
 </html>

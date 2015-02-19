@@ -32,7 +32,7 @@ public class ProfessorServiceImpl extends GenericServiceImpl<Professor> implemen
 		List<Professor> professores = professorRepository.find(Professor.class);
 		List<Professor> ativos = new ArrayList<Professor>();
 		for(Professor professor : professores) {
-			SimpleDateFormat format = new SimpleDateFormat(Constants.FORMATO_DATA_AFILIACAO);
+			SimpleDateFormat format = new SimpleDateFormat(br.ufc.quixada.npi.ldap.model.Constants.FORMATO_DATA_AFILIACAO);
 			try {
 				if(professor.getDataSaida() == null) {
 					ativos.add(professor);
