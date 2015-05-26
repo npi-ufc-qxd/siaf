@@ -58,8 +58,8 @@
 										<td>${professor.siape}</td>
 										<td>${professor.nome}</td>
 										<td>${professor.email}</td>
-										<td class="editProf" style="width: 10px;"><span
-											class="anoEdit" data-name="anoAdmissaoEdit">${professor.anoAdmissao}</span>.<span
+										<td class="editProf" style="width: 10px;"><span id = "ano${professor.id }"
+											class="anoEdit" data-name="anoAdmissaoEdit">${professor.anoAdmissao}</span>.<span id="semestreAdmisao${professor.id }"
 											class="semestreEdit"
 											data-value="${professor.semestreAdmissao}">${professor.semestreAdmissao}</span>
 										</td>

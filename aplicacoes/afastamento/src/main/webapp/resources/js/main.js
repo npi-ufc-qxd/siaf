@@ -43,6 +43,7 @@ $(document).ready(function() {
 	
 	$('#professores').on('click', '.edit', function(){
 	    var $btn = $(this);
+	    var ano = $('#professor'+id ).text();
 	    var id = $btn.data("id");
 		$('.options').removeClass( "show" ).addClass('hide');
 
@@ -57,9 +58,11 @@ $(document).ready(function() {
 	    
 	    $('select').selectpicker({}); 
 	    $('input').attr("size", "4");
+	  
 	    $('input').mask('9999', {placeholder:" "});
 	    $('input').attr("placeholder", "Ano");
-	    $('input').val($('#editProf' + id + ' span.anoEdit').text());
+	    $('input').atrr("value", ano);
+	    //$('input').val($('#editProf' + id + ' span.anoEdit').text());
 	    
 	});	
 
@@ -93,10 +96,15 @@ $(document).ready(function() {
 				}		
 			});
 		}
+		
+		
 		$("#contentProfessores td.editProf").css("width", "50px");
 		$("#contentProfessores td.editAcao").css("width", "40px");
 		
-	    
+		$('#ano'+id).empty().text(ano);
+		$('#semestreAdmisao'+id).empty().text(semestre);
+
+		
 	});
 	
 	
