@@ -1,4 +1,9 @@
+
+
 $(document).ready(function() {
+	
+
+	
 	// Página de Gerenciar Professores
 	var defaults = {
 		    mode: 'inline', 
@@ -471,11 +476,8 @@ $('.editReserva').on('click', function(event) {
 		    	filtroPeriodo();
 		    }
 		});
-	
-	$('#excluir-reserva').on('show.bs.modal', function(e) {
-		$(this).find('.modal-body').text('Tem certeza de que deseja excluir a reserva para o período \"' + $(e.relatedTarget).data('name') + '\"?');
-		$(this).find('.btn-danger').attr('href', $(e.relatedTarget).data('href'));
-	});
+
+		
 	
 	$('.salvarReserva').click(function() {
 		var id = $(this).data('id');
@@ -623,8 +625,22 @@ $('.editReserva').on('click', function(event) {
    	    minViewMode: "years"
 	});
 	
+	//Pagina listar Reserva - Excluir Reserva
+
+	$('#excluir').on('click', function(e) {
+		e.preventDefault();
+		var id = $(this).data('id');
+		$('#modal-excluir-reserva').data('id', id);	
+		$('#modal-excluir-reserva').find('.btn-danger').attr('href', '/siaf/reserva/' + id + '/excluir');	
+		});
+			
+	$('#btn-confirma-excluir-reserva').on('click', function(){
+		var id = $('#modal-excluir-reserva').data('id');
+		$('#modal-excluir-reserva').modal('hide');
+	});
 	
-		
+	
+	
 });
 
 function getRanking(ano, semestre) {

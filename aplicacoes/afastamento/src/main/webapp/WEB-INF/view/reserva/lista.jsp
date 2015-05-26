@@ -79,23 +79,22 @@
 						<tbody>
 							<c:forEach items="${reservas }" var="reserva">
 								<tr class="${reserva.status}">
-									<td>${reserva.anoInicio}.${reserva.semestreInicio} a
+									<td>${reserva.anoInicio}.${reserva.semestreInicio}a
 										${reserva.anoTermino}.${reserva.semestreTermino}</td>
 									<td>${reserva.programa.descricao }</td>
 									<td>${reserva.conceitoPrograma eq 0 ? "-" : reserva.conceitoPrograma}</td>
 									<td>${reserva.instituicao }</td>
 									<td>${reserva.status.descricao }</td>
 									<td><c:if test="${reserva.status eq 'ABERTO'}">
-											<a id="excluir" data-toggle="modal" data-target="#excluir-reserva" href="#"
+
+											<a id="excluir" data-id="${reserva.id }" data-toggle="modal" data-target="#modal-excluir-reserva" href="#"
 												data-href="<c:url value="/reserva/${reserva.id}/excluir"></c:url>"
-												data-name="${reserva.anoInicio}.${reserva.semestreInicio} a ${reserva.anoTermino}.${reserva.semestreTermino}">
-												<button class="btn btn-danger">
-													Excluir&nbsp;<i class="fa fa-trash-o"></i>
-												</button>
-											</a>
+												
+												class="btn btn-danger">Excluir</a>
+
 										</c:if> &nbsp;&nbsp; <c:if test="${periodo.status eq 'ABERTO' }">
 											<a href="<c:url value="/reserva/editar/${reserva.id }" />" class="btn btn-primary">Editar</a>
-								</c:if>
+										</c:if>
 								</tr>
 							</c:forEach>
 						</tbody>
@@ -111,7 +110,7 @@
 		</div>
 
 		<!-- Modal Excluir Reserva -->
-		<div class="modal fade" id="excluir-reserva" tabindex="-1" role="dialog"
+		<div class="modal fade" id="modal-excluir-reserva" tabindex="-1" role="dialog"
 			aria-labelledby="myModalLabel" aria-hidden="true">
 			<div class="modal-dialog">
 				<div class="modal-content">
@@ -123,7 +122,7 @@
 					</div>
 					<div class="modal-body"></div>
 					<div class="modal-footer">
-						<a href="#" class="btn btn-danger">Excluir</a>
+						<a  id="btn-confirma-excluir-reserva" class="btn btn-danger">Excluir</a>
 						<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
 					</div>
 				</div>
@@ -138,4 +137,3 @@
 	</script>
 </body>
 </html>
-
