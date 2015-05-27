@@ -119,8 +119,9 @@
 							<span aria-hidden="true">&times;</span>
 						</button>
 						<h4 class="modal-title" id="excluirModalLabel">Excluir</h4>
+						
 					</div>
-					<div class="modal-body"></div>
+					<div class="modal-body"><p>Tem certeza que deseja excluir a reserva?</p></div>
 					<div class="modal-footer">
 						<a  id="btn-confirma-excluir-reserva" class="btn btn-danger">Excluir</a>
 						<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
