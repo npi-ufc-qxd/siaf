@@ -34,10 +34,10 @@ $(document).ready(function() {
 	    type: 'select',
 	    emptytext : '',
 	    inputclass: 'selectpicker',
-	    value: $('#semestreAdmissao').val(),
+	    value: $('#semestreAdmissao18').text(),
 	    source: [
-	        {id:1 ,value: 1, text: '1'},
-	        {id:2 ,value: 2, text: '2'},
+	        {value: 1, text: '1'},
+	        {value: 2, text: '2'},
 	    ]
 	});	
 	
@@ -48,7 +48,6 @@ $(document).ready(function() {
 	    
 	    var ano = $('#anoAdmissao'+id ).text();
 	    var semestre = $('#semestreAdmissao' +id).text();
-	    $('semestreAdmissao').val(semestre);
 	    
 	    $('.options').removeClass( "show" ).addClass('hide');
 
@@ -62,17 +61,14 @@ $(document).ready(function() {
 	    $(this).closest('tr').find('.editable').editable('show');
 	    
 	    $('select').selectpicker({});
+	    $('.selectpicker').selectpicker('val', semestre);
+	    
 	    $('input').attr("size", "4");
 	  
 	    $('input').mask('9999', {placeholder:" "});
 	    $('input').attr("placeholder", "Ano");
 	    
 	    $('input').val(ano);
-	    $('.semestreEdit option:selected').val(semestre);
-	    $('select.semestreEdit').val(semestre);
-	    
-	    //$('input').val($('#editProf' + id + ' span.anoEdit').text());
-	   
 	});	
 
 
