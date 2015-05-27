@@ -79,7 +79,7 @@
 						<tbody>
 							<c:forEach items="${reservas }" var="reserva">
 								<tr class="${reserva.status}">
-									<td>${reserva.anoInicio}.${reserva.semestreInicio}a
+									<td>${reserva.anoInicio}.${reserva.semestreInicio} a
 										${reserva.anoTermino}.${reserva.semestreTermino}</td>
 									<td>${reserva.programa.descricao }</td>
 									<td>${reserva.conceitoPrograma eq 0 ? "-" : reserva.conceitoPrograma}</td>
