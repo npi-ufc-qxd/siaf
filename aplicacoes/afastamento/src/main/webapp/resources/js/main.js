@@ -34,18 +34,23 @@ $(document).ready(function() {
 	    type: 'select',
 	    emptytext : '',
 	    inputclass: 'selectpicker',
-	    value: 1,
+	    value: $('#semestreAdmissao').val(),
 	    source: [
-	        {value: 1, text: '1'},
-	        {value: 2, text: '2'},
+	        {id:1 ,value: 1, text: '1'},
+	        {id:2 ,value: 2, text: '2'},
 	    ]
 	});	
 	
+	
 	$('#professores').on('click', '.edit', function(){
 	    var $btn = $(this);
-	    var ano = $('#professor'+id ).text();
 	    var id = $btn.data("id");
-		$('.options').removeClass( "show" ).addClass('hide');
+	    
+	    var ano = $('#anoAdmissao'+id ).text();
+	    var semestre = $('#semestreAdmissao' +id).text();
+	    $('semestreAdmissao').val(semestre);
+	    
+	    $('.options').removeClass( "show" ).addClass('hide');
 
 	    $("#contentProfessores td.editProf").css("width", "160px");
 		$("#contentProfessores td.editAcao").css("width", "120px");
@@ -56,15 +61,20 @@ $(document).ready(function() {
 	    $(this).hide().siblings('.options' +id).removeClass( "hide" ).addClass('show');
 	    $(this).closest('tr').find('.editable').editable('show');
 	    
-	    $('select').selectpicker({}); 
+	    $('select').selectpicker({});
 	    $('input').attr("size", "4");
 	  
 	    $('input').mask('9999', {placeholder:" "});
 	    $('input').attr("placeholder", "Ano");
-	    $('input').atrr("value", ano);
-	    //$('input').val($('#editProf' + id + ' span.anoEdit').text());
 	    
+	    $('input').val(ano);
+	    $('.semestreEdit option:selected').val(semestre);
+	    $('select.semestreEdit').val(semestre);
+	    
+	    //$('input').val($('#editProf' + id + ' span.anoEdit').text());
+	   
 	});	
+
 
 	$('#professores').on('click', '.salvar', function() {
 	    var $btn = $(this);
@@ -72,6 +82,7 @@ $(document).ready(function() {
 	    var id = $btn.data("id");
 		var semestre = $( "select option:selected" ).val();
 		var ano = $("input").val();
+		
 		$(".options" +id).removeClass( "show" ).addClass('hide').siblings('.edit').show();
 		$btn.closest('tr').find('.editable').editable('hide');
 		
@@ -101,8 +112,8 @@ $(document).ready(function() {
 		$("#contentProfessores td.editProf").css("width", "50px");
 		$("#contentProfessores td.editAcao").css("width", "40px");
 		
-		$('#ano'+id).empty().text(ano);
-		$('#semestreAdmisao'+id).empty().text(semestre);
+		$('#anoAdmissao'+id).empty().text(ano);
+		$('#semestreAdmissao'+id).empty().text(semestre);
 
 		
 	});

@@ -46,20 +46,21 @@
 									<th class="afas-tr-left">Siape</th>
 									<th id="orderName">Nome</th>
 									<th>E-mail</th>
-									<th>Admisão</th>
+									<th>Admissão</th>
 									<th></th>
 								</tr>
 							</thead>
 							<tbody id="contentProfessores">
 								<c:forEach items="${professores}" var="professor"
 									varStatus="count">
+									<input type="hidden" value="${professor.semestreAdmissao }" id="semestreAdmissao"/>
 									<tr>
 										<td>${count.count}</td>
 										<td>${professor.siape}</td>
 										<td>${professor.nome}</td>
 										<td>${professor.email}</td>
-										<td class="editProf" style="width: 10px;"><span id = "ano${professor.id }"
-											class="anoEdit" data-name="anoAdmissaoEdit">${professor.anoAdmissao}</span>.<span id="semestreAdmisao${professor.id }"
+										<td class="editProf" style="width: 10px;"><span id = "anoAdmissao${professor.id }"
+											class="anoEdit" data-name="anoAdmissaoEdit">${professor.anoAdmissao}</span>.<span id="semestreAdmissao${professor.id }"
 											class="semestreEdit"
 											data-value="${professor.semestreAdmissao}">${professor.semestreAdmissao}</span>
 										</td>
