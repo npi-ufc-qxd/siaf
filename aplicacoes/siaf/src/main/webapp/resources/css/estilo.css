@@ -21,7 +21,7 @@ body {
 
 .brand {
 	float: left;
-	height: 100px;
+	height: 80px;
 }
 
 .brand img {
@@ -30,7 +30,6 @@ body {
 
 .menuTop {
 	float: left;
-	width: 900px;
 	height: 67px;
 	margin-top: 40px;
 }
@@ -51,12 +50,11 @@ body {
 
 .menuTop ul li a {
 	color: #555;
-	font: bold 13px "arial", sans-serif;
-	padding: 15px 15px 5px;
+	font-size: 15px;
+	padding: 15px 10px 5px;
 	text-decoration: underline !important;
 	display: block;
-	border-bottom: 2px dashed;
-	margin: 3px;
+	border-bottom: 1px solid;
 }
 
 .menuTop ul li a:hover, .menuTop ul li.active a {
@@ -595,12 +593,6 @@ div.dataTables_wrapper {
     margin: 0 auto;
 }
 
-/* #tableHistorico tbody tr td {
-	font-size: 17px;
-	text-align: center;
-	width: 10%;
-} */
-
 #tableHistorico tbody tr td span {
 	font-size: 12px;
 }
@@ -617,7 +609,29 @@ div.dataTables_wrapper {
 	text-align: left !important;
 }
 
-table {display: inline-table}
+table {
+	display: inline-table
+}
+
+#relatorio-header {
+	text-align: center;
+}
+
+#relatorio-legenda {
+	margin-top: 20px;
+}
+
+#relatorio-legenda label {
+	margin-right: 30px;
+}
+
+#relatorio-header label {
+	width: 100%;
+}
+
+#relatorio-header span {
+	font-size: 15px;
+}
 
 @media print {
 	.menuTop {
@@ -631,7 +645,17 @@ table {display: inline-table}
 	}
 	a[href]:after {
     	content: none !important;
-  }
+  	}
+  	#relatorio-header {
+		margin-top: -100px;
+	}
+  @page {size: landscape}
+  .page
+    {
+     -webkit-transform: rotate(-90deg); 
+     -moz-transform:rotate(-90deg);
+     filter:progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
+    }
 }
 
 @-webkit-keyframes loading {

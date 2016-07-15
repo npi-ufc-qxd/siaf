@@ -15,6 +15,7 @@
 <script src="<c:url value="/resources/js/jquery.validate.min.js" />"></script>
 <script src="<c:url value="/resources/js/jquery.bootgrid.min.js" />"></script>
 <script src="<c:url value="/resources/js/jquery.dataTables.min.js" />"></script>
+<script src="<c:url value="/resources/js/numeric-comma.js" />"></script>
 <script src="<c:url value="/resources/js/highcharts.js" />"></script>
 <script src="<c:url value="/resources/js/jquery-printme.min.js" />"></script>
 

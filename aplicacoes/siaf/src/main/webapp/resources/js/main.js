@@ -120,13 +120,21 @@ $(document).ready(function() {
 		}
 	});
 	
-	/*$('#tableRelatorio').DataTable({
-		 "order": [ 0, 'asc' ],
-		  "paging": false,
-		  "searching": false,
-		"language": {
+	$('#tableRelatorio').DataTable({
+		'aoColumnDefs': [
+		{
+			'bSortable': false,
+			'aTargets': ['nosort']
+		},
+		{ "sType": "numeric-comma", "aTargets": [ 2 ] }
+		],
+		"order": [ 1, 'asc' ],
+	  	"paging": false,
+	  	"searching": false,
+	  	"scrollX": true,
+	  	"language": {
 		    "sEmptyTable": "Nenhum registro encontrado.",
-		    "sInfo": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+		    "sInfo": "Total de _TOTAL_ registros",
 		    "sInfoEmpty": "Mostrando 0 até 0 de 0 registros",
 		    "sInfoFiltered": "(Filtrados de _MAX_ registros)",
 		    "sInfoPostFix": "",
@@ -148,8 +156,7 @@ $(document).ready(function() {
 		        "sSortDescending": ": Ordenar colunas de forma descendente"
 		    }
 		}
-	});*/
-	
+	});	
 	
 //_____________________________________________________________________________________________________	
 	

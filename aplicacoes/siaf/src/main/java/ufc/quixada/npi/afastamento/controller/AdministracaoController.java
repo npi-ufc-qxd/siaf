@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpSession;
@@ -20,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import br.ufc.quixada.npi.ldap.model.Usuario;
+import br.ufc.quixada.npi.ldap.service.UsuarioService;
 import ufc.quixada.npi.afastamento.model.Acao;
 import ufc.quixada.npi.afastamento.model.Afastamento;
 import ufc.quixada.npi.afastamento.model.AutorAcao;
@@ -28,7 +29,6 @@ import ufc.quixada.npi.afastamento.model.Periodo;
 import ufc.quixada.npi.afastamento.model.Professor;
 import ufc.quixada.npi.afastamento.model.Programa;
 import ufc.quixada.npi.afastamento.model.Ranking;
-import ufc.quixada.npi.afastamento.model.RelatorioPeriodo;
 import ufc.quixada.npi.afastamento.model.Reserva;
 import ufc.quixada.npi.afastamento.model.StatusReserva;
 import ufc.quixada.npi.afastamento.model.TuplaRanking;
@@ -39,8 +39,6 @@ import ufc.quixada.npi.afastamento.service.ProfessorService;
 import ufc.quixada.npi.afastamento.service.RankingService;
 import ufc.quixada.npi.afastamento.service.ReservaService;
 import ufc.quixada.npi.afastamento.util.Constants;
-import br.ufc.quixada.npi.ldap.model.Usuario;
-import br.ufc.quixada.npi.ldap.service.UsuarioService;
 
 @Controller
 @RequestMapping("administracao")
@@ -93,17 +91,6 @@ public class AdministracaoController {
 		return Constants.REDIRECT_PAGINA_LISTAR_PROFESSORES;
 	}
 	
-	@RequestMapping(value = "/relatorio", method = RequestMethod.GET)
-	public String getRelatorio(Model model) {
-		Periodo periodo = periodoService.getPeriodoAtual();
-		if (periodo != null) {
-			Map<TuplaRanking, List<RelatorioPeriodo>> relatorio = rankingService.getRelatorio(periodo);
-			model.addAttribute("relatorio", relatorio);
-			model.addAttribute("periodos", periodoService.getPeriodoAbertos());
-		}
-		return "admin/relatorio";
-	}
-
 	@RequestMapping(value = "/homologacao", method = RequestMethod.GET)
 	public String getHomologacao(Model model) {
 		Periodo periodo = periodoService.getPeriodoAtual();

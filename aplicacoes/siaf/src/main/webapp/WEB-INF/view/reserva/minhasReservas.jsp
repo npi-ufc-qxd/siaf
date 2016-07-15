@@ -36,7 +36,6 @@
 			<form id="minhasReservas" class="form-horizontal">
 				<div>
 					<a title="Nova reserva" href="<c:url value="/reserva/incluir" />" class="btn btn-siaf">Nova reserva</a>
-					<a title="Visualizar prévia do ranking" href="<c:url value="/reserva/previa-ranking" />" class="btn btn-siaf">Visualizar prévia do ranking</a>
 				</div>
 				<br>
 				<div class="form-group">

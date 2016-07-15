@@ -12,6 +12,9 @@
     		<li id="menu-ranking">
     			<a class="" href="<c:url value="/reserva/ranking" />"><span>Ranking</span></a>
     		</li>
+    		<li id="menu-previa-ranking">
+    			<a class="" href="<c:url value="/reserva/previa-ranking" />"><span>Prévia do Ranking</span></a>
+    		</li>
     		<li id="menu-minhas-reservas">
     			<a class="" href="<c:url value="/reserva/minhas-reservas" />"><span>Minhas Reservas</span></a>
     		</li>
@@ -29,7 +32,9 @@
 	    			<a class="" href="<c:url value="/administracao/professores" />"><span>Professores</span></a>
 	    		</li>
     		</sec:authorize>
-    		
+    		<li id="menu-mapa-ranking">
+    			<a class="" href="<c:url value="/relatorio" />"><span>Mapa do Ranking</span></a>
+    		</li>
     		
     		<li id="sair">
     			<a class="" href="<c:url value="/logout" />"><span>Sair</span></a>
