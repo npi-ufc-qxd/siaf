@@ -35,7 +35,7 @@
 
 			<form id="minhasReservas" class="form-horizontal">
 				<div>
-					<a title="Nova reserva" href="<c:url value="/reserva/incluir" />" class="btn btn-siaf">Nova reserva</a>
+					<a title="Nova reserva" href="<c:url value="/docente/incluir" />" class="btn btn-siaf">Nova reserva</a>
 				</div>
 				<br>
 				<div class="form-group">

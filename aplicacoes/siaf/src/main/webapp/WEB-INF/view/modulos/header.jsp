@@ -15,9 +15,11 @@
     		<li id="menu-previa-ranking">
     			<a class="" href="<c:url value="/reserva/previa-ranking" />"><span>Prévia do Ranking</span></a>
     		</li>
-    		<li id="menu-minhas-reservas">
-    			<a class="" href="<c:url value="/reserva/minhas-reservas" />"><span>Minhas Reservas</span></a>
-    		</li>
+    		<sec:authorize ifAnyGranted="DOCENTE">
+	    		<li id="menu-minhas-reservas">
+	    			<a class="" href="<c:url value="/docente/minhas-reservas" />"><span>Minhas Reservas</span></a>
+	    		</li>
+	    	</sec:authorize>
     		<li id="menu-reservas">
     			<a class="" href="<c:url value="/reserva/listar" />"><span>Reservas</span></a>
     		</li>

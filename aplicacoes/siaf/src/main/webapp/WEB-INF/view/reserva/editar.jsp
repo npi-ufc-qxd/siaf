@@ -108,7 +108,7 @@
 
 				<div class="controls">
 					<input name="atualizar" type="submit" class="btn btn-siaf" value="Atualizar" />
-					<a href="<c:url value="/reserva/minhas-reservas" />" class="btn btn-default">Cancelar</a>
+					<a href="<c:url value="/docente/minhas-reservas" />" class="btn btn-default">Cancelar</a>
 				</div>
 			</form:form>
 		</div>

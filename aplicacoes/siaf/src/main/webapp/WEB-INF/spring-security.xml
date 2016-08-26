@@ -27,11 +27,11 @@
 		<access-denied-handler error-page="/403" />
  		<intercept-url pattern="/login*" access="IS_AUTHENTICATED_ANONYMOUSLY" /> 
  		<intercept-url pattern="/webjars/**" access="IS_AUTHENTICATED_ANONYMOUSLY" /> 		
- 		<intercept-url pattern="/resources/**" access="IS_AUTHENTICATED_ANONYMOUSLY" /> 		
- 		<intercept-url pattern="/reserva/ranking/**" access="DOCENTE,ADMIN_SIAF" />
- 		<intercept-url pattern="/reserva/ranking.json/**" access="DOCENTE,ADMIN_SIAF" />
- 		<intercept-url pattern="/reserva/**" access="DOCENTE" />
+ 		<intercept-url pattern="/resources/**" access="IS_AUTHENTICATED_ANONYMOUSLY" />
+ 		<intercept-url pattern="/docente/**" access="DOCENTE" />
 		<intercept-url pattern="/administracao/**" access="ADMIN-SIAF" />
+		<intercept-url pattern="/relatorio/**" access="ADMIN-SIAF, DOCENTE" />
+		<intercept-url pattern="/**" access="ADMIN-SIAF, DOCENTE" />	
  		
  		<form-login login-page="/login" authentication-success-handler-ref="myAuthenticationSuccessHandler" 
  			authentication-failure-url="/loginfailed" />
