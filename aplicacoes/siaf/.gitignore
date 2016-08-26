@@ -1,8 +1,5 @@
-<<<<<<< HEAD
 /bin/
 .settings
-=======
-/bin
 /target
 .project
->>>>>>> refs/remotes/origin/master
+.classpath
