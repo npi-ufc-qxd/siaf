@@ -47,11 +47,11 @@ public class Constants {
 	
 	public static final String REDIRECT_PAGINA_HOMOLOGAR_RESERVAS = "redirect:/administracao/homologacao";
 	
-	public static final String REDIRECT_PAGINA_INCLUIR_RESERVAS = "redirect:/reserva/incluir";
+	public static final String REDIRECT_PAGINA_INCLUIR_RESERVAS = "redirect:/docente/incluir";
 	
-	public static final String REDIRECT_PAGINA_MINHAS_RESERVAS = "redirect:/reserva/minhas-reservas";
+	public static final String REDIRECT_PAGINA_MINHAS_RESERVAS = "redirect:/docente/minhas-reservas";
 	
-	public static final String REDIRECT_PAGINA_EDITAR_RESERVAS = "redirect:/reserva/editar";
+	public static final String REDIRECT_PAGINA_EDITAR_RESERVAS = "redirect:/docente/editar";
 	
 	public static final String REDIRECT_PAGINA_LISTAR_PERIODOS = "redirect:/administracao/periodos";
 	

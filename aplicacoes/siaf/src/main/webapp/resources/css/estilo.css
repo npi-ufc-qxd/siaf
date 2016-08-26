@@ -21,17 +21,15 @@ body {
 
 .brand {
 	float: left;
-	height: 100px;
+	height: 80px;
 }
 
 .brand img {
-	width: 100%;
 	height: 100%;
 }
 
 .menuTop {
 	float: left;
-	width: 900px;
 	height: 67px;
 	margin-top: 40px;
 }
@@ -52,12 +50,11 @@ body {
 
 .menuTop ul li a {
 	color: #555;
-	font: bold 13px "arial", sans-serif;
-	padding: 15px 15px 5px;
+	font-size: 15px;
+	padding: 15px 10px 5px;
 	text-decoration: underline !important;
 	display: block;
-	border-bottom: 2px dashed;
-	margin: 3px;
+	border-bottom: 1px solid;
 }
 
 .menuTop ul li a:hover, .menuTop ul li.active a {
@@ -203,32 +200,28 @@ table {
 	background-color: #BBD4E1;
 }
 
-.table > tbody > tr.AFASTADO {
-	background-color: #BBD4E1;
+table > tbody > tr.AFASTADO {
+	background-color: #BBD4E1 !important;
 }
 
-table > tbody > tr.DESCLASSIFICADO, .table > tbody > tr.NAO_ACEITO {
-	background-color: #F2BF7C;
+table > tbody > tr.DESCLASSIFICADO, table > tbody > tr.NAO_ACEITO {
+	background-color: #F2BF7C !important;
 }
 
-.table > tbody > tr.ENCERRADO {
+table > tbody > tr.ENCERRADO {
 	background-color: #C5C5C5;
 }
 
-.table > tbody > tr.CLASSIFICADO {
-	background-color: #95CF9E;
+table > tbody > tr.CLASSIFICADO {
+	background-color: #95CF9E !important;
 }
 
-.table > tbody > tr.CANCELADO, .table > tbody > tr.CANCELADO_COM_PUNICAO, .table > tbody > tr.NEGADO {
+table > tbody > tr.CANCELADO, table > tbody > tr.CANCELADO_COM_PUNICAO, table > tbody > tr.NEGADO {
 	background-color: #FFBEA9;
 }
 
-.table > tbody > tr > td.pontuacao {
+table > tbody > tr > td.pontuacao {
 	font-weight: bold;
-}
-
-.align-center {
-	text-align: center;
 }
 
 div.warning {
@@ -595,14 +588,74 @@ button, input.btn {
 	
 }
 
-/* #tableHistorico tbody tr td {
-	font-size: 17px;
-	text-align: center;
-	width: 10%;
-} */
+div.dataTables_wrapper {
+    width: 1140px;
+    margin: 0 auto;
+}
 
 #tableHistorico tbody tr td span {
 	font-size: 12px;
+}
+
+#tableRelatorio_wrapper th, #tableRelatorio td {
+	text-align: center;
+}
+
+.align-center {
+	text-align: center;
+}
+
+.align-left {
+	text-align: left !important;
+}
+
+table {
+	display: inline-table
+}
+
+#relatorio-header {
+	text-align: center;
+}
+
+#relatorio-legenda {
+	margin-top: 20px;
+}
+
+#relatorio-legenda label {
+	margin-right: 30px;
+}
+
+#relatorio-header label {
+	width: 100%;
+}
+
+#relatorio-header span {
+	font-size: 15px;
+}
+
+@media print {
+	.menuTop {
+		display: none;
+	}
+	#wrapper, #tableRelatorio_wrapper {
+		width: 100%;
+	}
+	footer {
+		display: none;
+	}
+	a[href]:after {
+    	content: none !important;
+  	}
+  	#relatorio-header {
+		margin-top: -100px;
+	}
+  @page {size: landscape}
+  .page
+    {
+     -webkit-transform: rotate(-90deg); 
+     -moz-transform:rotate(-90deg);
+     filter:progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
+    }
 }
 
 @-webkit-keyframes loading {

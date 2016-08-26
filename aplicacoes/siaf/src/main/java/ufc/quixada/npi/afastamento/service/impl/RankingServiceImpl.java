@@ -13,6 +13,7 @@ import javax.inject.Named;
 import ufc.quixada.npi.afastamento.model.Afastamento;
 import ufc.quixada.npi.afastamento.model.Periodo;
 import ufc.quixada.npi.afastamento.model.Programa;
+import ufc.quixada.npi.afastamento.model.RelatorioPeriodo;
 import ufc.quixada.npi.afastamento.model.Reserva;
 import ufc.quixada.npi.afastamento.model.StatusReserva;
 import ufc.quixada.npi.afastamento.model.StatusTupla;
@@ -33,22 +34,143 @@ public class RankingServiceImpl implements RankingService {
 
 	@Inject
 	private PeriodoService periodoService;
-
+	
+	
 	@Override
-	public List<TuplaRanking> visualizarRanking(Periodo periodo, boolean simulador) {
+	public Map<TuplaRanking, List<RelatorioPeriodo>> getRelatorio(Periodo periodo) {
 		List<Periodo> periodos = periodoService.getPeriodoAbertos();
-		Map<Periodo, List<TuplaRanking>> ranking = new HashMap<Periodo, List<TuplaRanking>>();
+		Map<Periodo, List<TuplaRanking>> rankings = new HashMap<Periodo, List<TuplaRanking>>();
+		Map<TuplaRanking, List<RelatorioPeriodo>> relatorio = new HashMap<TuplaRanking, List<RelatorioPeriodo>>();
 		for (Periodo p : periodos) {
-			ranking.put(p, new ArrayList<TuplaRanking>());
+			rankings.put(p, new ArrayList<TuplaRanking>());
 		}
 
 		List<TuplaRanking> tuplas = new ArrayList<TuplaRanking>();
 		List<Reserva> reservas = new ArrayList<Reserva>();
 		List<Reserva> reservasEmAberto = reservaService.getReservasByStatus(StatusReserva.ABERTO);
-		reservas.addAll(reservaService.getReservasByStatus(StatusReserva.AFASTADO));
 		reservas.addAll(reservasEmAberto);
+		reservas.addAll(reservaService.getReservasByStatus(StatusReserva.AFASTADO));
+
+		tuplas.addAll(calculaPontuacao(reservas, periodo));
+
+		Collections.sort(tuplas, new Comparator<TuplaRanking>() {
+			@Override
+			public int compare(TuplaRanking tupla1, TuplaRanking tupla2) {
+				if (tupla1.getPontuacao().compareTo(tupla2.getPontuacao()) == 0.0f) {
+					if (tupla1.getReserva().getPrograma().equals(tupla2.getReserva().getPrograma())) {
+						if (tupla1.getReserva().getConceitoPrograma().equals(tupla2.getReserva().getConceitoPrograma())) {
+							
+							return tupla1.getReserva().getProfessor().getDataNascimento()
+									.compareTo(tupla2.getReserva().getProfessor().getDataNascimento());
+						}
+						return tupla2.getReserva().getConceitoPrograma().compareTo(tupla1.getReserva().getConceitoPrograma());
+					}
+					if (tupla1.getReserva().getPrograma().equals(Programa.MESTRADO)) {
+						return -1;
+					}
+					if (tupla2.getReserva().getPrograma().equals(Programa.MESTRADO)) {
+						return 1;
+					}
+					if (tupla1.getReserva().getPrograma().equals(Programa.DOUTORADO)) {
+						return -1;
+					}
+					if (tupla2.getReserva().getPrograma().equals(Programa.DOUTORADO)) {
+						return 1;
+					}
+				}
+				return tupla2.getPontuacao().compareTo(tupla1.getPontuacao());
+			}
+		});
+
+		// Coloca primeiramente nos períodos os que já estão afastados
+		for (TuplaRanking tupla : tuplas) {
+			relatorio.put(tupla, new ArrayList<RelatorioPeriodo>());
+			if (tupla.getReserva().getStatus().equals(StatusReserva.AFASTADO)) {
+				Periodo periodoInicio = periodoService
+						.getPeriodo(tupla.getReserva().getAnoInicio(), tupla.getReserva().getSemestreInicio());
+				Periodo periodoTermino = periodoService.getPeriodo(tupla.getReserva().getAnoTermino(), tupla.getReserva()
+						.getSemestreTermino());
+				for (; periodoInicio != null && !periodoInicio.equals(periodoService.getPeriodoPosterior(periodoTermino)); periodoInicio = periodoService
+						.getPeriodoPosterior(periodoInicio)) {
+					RelatorioPeriodo relatorioPeriodo = new RelatorioPeriodo();
+					relatorioPeriodo.setAno(periodoInicio.getAno());
+					relatorioPeriodo.setSemestre(periodoInicio.getSemestre());
+					relatorioPeriodo.setStatus(StatusTupla.AFASTADO);
+					List<RelatorioPeriodo> r = relatorio.get(tupla);
+					r.add(relatorioPeriodo);
+					relatorio.put(tupla, r);
+					if (rankings.containsKey(periodoInicio)) {
+						tupla.setStatus(StatusTupla.AFASTADO);
+						List<TuplaRanking> tuplaPeriodo = rankings.get(periodoInicio);
+						tuplaPeriodo.add(tupla);
+						rankings.put(periodoInicio, tuplaPeriodo);
+					}
+				}
+			}
+		}
+
+		for (TuplaRanking tupla : tuplas) {
+			if (!tupla.getReserva().getStatus().equals(StatusReserva.AFASTADO)) {
+				boolean classificado = true;
+				Periodo periodoInicio = periodoService
+						.getPeriodo(tupla.getReserva().getAnoInicio(), tupla.getReserva().getSemestreInicio());
+				Periodo periodoTermino = periodoService.getPeriodo(tupla.getReserva().getAnoTermino(), tupla.getReserva()
+						.getSemestreTermino());
+				for (; periodoInicio != null && !periodoInicio.equals(periodoService.getPeriodoPosterior(periodoTermino)); periodoInicio = periodoService
+						.getPeriodoPosterior(periodoInicio)) {
+					RelatorioPeriodo relatorioPeriodo = new RelatorioPeriodo();
+					relatorioPeriodo.setAno(periodoInicio.getAno());
+					relatorioPeriodo.setSemestre(periodoInicio.getSemestre());
+					int vagas = periodoInicio.getVagas();
+					for (TuplaRanking t : rankings.get(periodoInicio)) {
+						if (t.getStatus().equals(StatusTupla.AFASTADO) || t.getStatus().equals(StatusTupla.CLASSIFICADO)) {
+							vagas--;
+						}
+					}
+					if (vagas <= 0) {
+						tupla.setStatus(StatusTupla.DESCLASSIFICADO);
+						relatorioPeriodo.setStatus(StatusTupla.DESCLASSIFICADO);
+						classificado = false;
+						//break;
+					} else {
+						relatorioPeriodo.setStatus(StatusTupla.CLASSIFICADO);
+					}
+					List<RelatorioPeriodo> r = relatorio.get(tupla);
+					r.add(relatorioPeriodo);
+					relatorio.put(tupla, r);
+				}
+				if (classificado) {
+					tupla.setStatus(StatusTupla.CLASSIFICADO);
+				}
+				periodoInicio = periodoService.getPeriodo(tupla.getReserva().getAnoInicio(), tupla.getReserva().getSemestreInicio());
+				for (; periodoInicio != null && !periodoInicio.equals(periodoService.getPeriodoPosterior(periodoTermino)); periodoInicio = periodoService
+						.getPeriodoPosterior(periodoInicio)) {
+					List<TuplaRanking> tuplaPeriodo = rankings.get(periodoInicio);
+					tuplaPeriodo.add(tupla);
+					rankings.put(periodoInicio, tuplaPeriodo);
+				}
+			}
+		}
+
+		return relatorio;
+	}
+
+	@Override
+	public List<TuplaRanking> getRanking(Periodo periodo, boolean simulador) {
+		List<Periodo> periodos = periodoService.getPeriodoAbertos();
+		Map<Periodo, List<TuplaRanking>> rankings = new HashMap<Periodo, List<TuplaRanking>>();
+		for (Periodo p : periodos) {
+			rankings.put(p, new ArrayList<TuplaRanking>());
+		}
+
+		List<TuplaRanking> tuplas = new ArrayList<TuplaRanking>();
+		List<Reserva> reservas = new ArrayList<Reserva>();
+		List<Reserva> reservasEmAberto = reservaService.getReservasByStatus(StatusReserva.ABERTO);
+		reservas.addAll(reservasEmAberto);
+		reservas.addAll(reservaService.getReservasByStatus(StatusReserva.AFASTADO));
 		if(simulador) {
 			List<Reserva> reservasEmEspera = reservaService.getReservasByStatus(StatusReserva.EM_ESPERA);
+			reservas.addAll(reservasEmEspera);
 			for (Reserva reservaEspera : reservasEmEspera) {
 				for (Reserva reservaAberta : reservasEmAberto) {
 					if (reservaAberta.getProfessor().equals(reservaEspera.getProfessor())) {
@@ -56,7 +178,6 @@ public class RankingServiceImpl implements RankingService {
 					}
 				}
 			}
-			reservas.addAll(reservaService.getReservasByStatus(StatusReserva.EM_ESPERA));
 		}
 
 		tuplas.addAll(calculaPontuacao(reservas, periodo));
@@ -90,7 +211,7 @@ public class RankingServiceImpl implements RankingService {
 			}
 		});
 
-		// Coloca primeiramente nos períodos os que já estão classificados
+		// Coloca primeiramente nos períodos os que já estão afastados
 		for (TuplaRanking tupla : tuplas) {
 			if (tupla.getReserva().getStatus().equals(StatusReserva.AFASTADO)) {
 				Periodo periodoInicio = periodoService
@@ -99,11 +220,11 @@ public class RankingServiceImpl implements RankingService {
 						.getSemestreTermino());
 				for (; periodoInicio != null && !periodoInicio.equals(periodoService.getPeriodoPosterior(periodoTermino)); periodoInicio = periodoService
 						.getPeriodoPosterior(periodoInicio)) {
-					if (ranking.containsKey(periodoInicio)) {
+					if (rankings.containsKey(periodoInicio)) {
 						tupla.setStatus(StatusTupla.AFASTADO);
-						List<TuplaRanking> tuplaPeriodo = ranking.get(periodoInicio);
+						List<TuplaRanking> tuplaPeriodo = rankings.get(periodoInicio);
 						tuplaPeriodo.add(tupla);
-						ranking.put(periodoInicio, tuplaPeriodo);
+						rankings.put(periodoInicio, tuplaPeriodo);
 					}
 				}
 			}
@@ -119,7 +240,7 @@ public class RankingServiceImpl implements RankingService {
 				for (; periodoInicio != null && !periodoInicio.equals(periodoService.getPeriodoPosterior(periodoTermino)); periodoInicio = periodoService
 						.getPeriodoPosterior(periodoInicio)) {
 					int vagas = periodoInicio.getVagas();
-					for (TuplaRanking t : ranking.get(periodoInicio)) {
+					for (TuplaRanking t : rankings.get(periodoInicio)) {
 						if (t.getStatus().equals(StatusTupla.AFASTADO) || t.getStatus().equals(StatusTupla.CLASSIFICADO)) {
 							vagas--;
 						}
@@ -136,18 +257,18 @@ public class RankingServiceImpl implements RankingService {
 				periodoInicio = periodoService.getPeriodo(tupla.getReserva().getAnoInicio(), tupla.getReserva().getSemestreInicio());
 				for (; periodoInicio != null && !periodoInicio.equals(periodoService.getPeriodoPosterior(periodoTermino)); periodoInicio = periodoService
 						.getPeriodoPosterior(periodoInicio)) {
-					List<TuplaRanking> tuplaPeriodo = ranking.get(periodoInicio);
+					List<TuplaRanking> tuplaPeriodo = rankings.get(periodoInicio);
 					tuplaPeriodo.add(tupla);
-					ranking.put(periodoInicio, tuplaPeriodo);
+					rankings.put(periodoInicio, tuplaPeriodo);
 				}
 			}
 		}
 
-		return ranking.get(periodo);
+		return rankings.get(periodo);
 	}
 
 	@Override
-	public List<TuplaRanking> visualizarRankingByStatusReservaAndPeriodo(List<StatusReserva> status, Periodo periodo) {
+	public List<TuplaRanking> getTuplas(List<StatusReserva> status, Periodo periodo) {
 		List<TuplaRanking> tuplas = new ArrayList<TuplaRanking>();
 		List<Reserva> reservas = new ArrayList<Reserva>();
 

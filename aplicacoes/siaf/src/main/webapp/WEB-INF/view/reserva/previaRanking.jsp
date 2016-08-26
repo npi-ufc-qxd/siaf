@@ -41,11 +41,6 @@
 			<input type="hidden" id="anoAnterior" value="${periodoAnterior.ano }" />
 			<input type="hidden" id="semestreAnterior" value="${periodoAnterior.semestre }" />
 			
-			<div style="display: inline-block; width: 100%">
-				<div class="title"> Visualizar Prévia do Ranking : </div>
-				<span class="line"></span>
-			</div>
-			
 			<div id="ranking-full">
 				<div id="warning-buscar-periodo" class="alert alert-warning" role="alert">
 					Não é possivel realizar busca por períodos passados.
@@ -172,7 +167,7 @@
 <script type="text/javascript">
 	$('i#anterior').hide();
 	getRanking($('#ano').val(), $('#semestre').val(), true);
-	$('#menu-minhas-reservas').addClass('active');
+	$('#menu-previa-ranking').addClass('active');
 </script>
 </html>
 

@@ -118,7 +118,7 @@ public class PeriodoServiceImpl extends GenericServiceImpl<Periodo> implements P
 
 	@Override
 	public void encerrarPeriodo(Periodo periodo) {
-		List<TuplaRanking> ranking = rankingService.visualizarRanking(periodo, false);
+		List<TuplaRanking> ranking = rankingService.getRanking(periodo, false);
 		for (TuplaRanking tupla : ranking) {
 			if(tupla.getReserva().getStatus().equals(StatusReserva.AFASTADO)
 					&& tupla.getReserva().getAnoTermino().equals(periodo.getAno())
@@ -131,7 +131,7 @@ public class PeriodoServiceImpl extends GenericServiceImpl<Periodo> implements P
 		}
 		periodo.setStatus(StatusPeriodo.ENCERRADO);
 		this.update(periodo);
-		ranking = rankingService.visualizarRanking(this.getPeriodoPosterior(periodo), false);
+		ranking = rankingService.getRanking(this.getPeriodoPosterior(periodo), false);
 		for (TuplaRanking tupla : ranking) {
 			if(tupla.getStatus().equals(StatusTupla.DESCLASSIFICADO)) {
 				Reserva reserva = tupla.getReserva();

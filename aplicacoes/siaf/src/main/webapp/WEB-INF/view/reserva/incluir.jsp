@@ -16,7 +16,7 @@
 		<div id="content">
 			<div class="title"> Inclua sua reserva de afastamento : </div>
 			<span class="line"></span>
-			<form:form id="solicitarAfastamento" commandName="reserva" action="/siaf/reserva/incluir" method="POST" class="form-horizontal">
+			<form:form id="solicitarAfastamento" commandName="reserva" action="/siaf/docente/incluir" method="POST" class="form-horizontal">
 				<c:if test="${not empty erro}">
 					<div class="alert alert-danger alert-dismissible margin-top" role="alert">
 						<button type="button" class="close" data-dismiss="alert">

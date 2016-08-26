@@ -55,9 +55,6 @@
 							name="j_password" id="key" class="form-control" placeholder="senha" required="required">
 					</div>
 				</div>
-
-
-
 				
 				<div id="div-captcha-erro">
 					<div id="captcha-login" class=""></div>
