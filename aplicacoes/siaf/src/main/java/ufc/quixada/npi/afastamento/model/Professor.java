@@ -1,27 +1,23 @@
 package ufc.quixada.npi.afastamento.model;
 
-import java.util.Date;
 import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
-import javax.persistence.Transient;
-import javax.validation.constraints.Size;
+import javax.persistence.OneToOne;
 
 @Entity
-@EntityListeners(ProfessorEntityListener.class)
 public class Professor {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Size(min = 11, message="Minino 11 dígitos")
+	/*@Size(min = 11, message="Minino 11 dígitos")
 	private String cpf;
 	
 	@Transient
@@ -31,31 +27,34 @@ public class Professor {
 	private String email;
 	
 	@Transient
-	private String siape;
+	private String siape;*/
 
-	@Transient
-	private Date dataNascimento;
+	/*@Transient
+	private Date dataNascimento;*/
 	
 	private Integer anoAdmissao;
 	
 	private Integer semestreAdmissao;
 
-	@Transient
+	/*@Transient
 	private Date dataAdmissao;
 
 	@Transient
-	private Date dataSaida;
+	private Date dataSaida;*/
+	
+	@OneToOne(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+	private Usuario usuario;
 	
 	@OneToMany(mappedBy = "professor", cascade = CascadeType.REMOVE)
 	private List<Reserva> reservas;
 
-	public String getCpf() {
+	/*public String getCpf() {
 		return cpf;
 	}
 
 	public void setCpf(String cpf) {
 		this.cpf = cpf;
-	}
+	}*/
 
 	public Long getId() {
 		return id;
@@ -65,21 +64,21 @@ public class Professor {
 		this.id = id;
 	}
 
-	public String getSiape() {
+	/*public String getSiape() {
 		return siape;
 	}
 
 	public void setSiape(String siape) {
 		this.siape = siape;
-	}
+	}*/
 
-	public Date getDataNascimento() {
+	/*public Date getDataNascimento() {
 		return dataNascimento;
 	}
 
 	public void setDataNascimento(Date dataNascimento) {
 		this.dataNascimento = dataNascimento;
-	}
+	}*/
 
 	public Integer getAnoAdmissao() {
 		return anoAdmissao;
@@ -97,7 +96,7 @@ public class Professor {
 		this.semestreAdmissao = semestreAdmissao;
 	}
 
-	public Date getDataSaida() {
+	/*public Date getDataSaida() {
 		return dataSaida;
 	}
 
@@ -111,6 +110,14 @@ public class Professor {
 
 	public void setDataAdmissao(Date dataAdmissao) {
 		this.dataAdmissao = dataAdmissao;
+	}*/
+
+	public Usuario getUsuario() {
+		return usuario;
+	}
+
+	public void setUsuario(Usuario usuario) {
+		this.usuario = usuario;
 	}
 
 	public List<Reserva> getReservas() {
@@ -129,7 +136,7 @@ public class Professor {
 		return result;
 	}
 
-	public String getNome() {
+	/*public String getNome() {
 		return nome;
 	}
 
@@ -143,7 +150,7 @@ public class Professor {
 
 	public void setEmail(String email) {
 		this.email = email;
-	}
+	}*/
 
 	@Override
 	public boolean equals(Object obj) {
@@ -154,10 +161,10 @@ public class Professor {
 		if (getClass() != obj.getClass())
 			return false;
 		Professor other = (Professor) obj;
-		if (cpf == null) {
-			if (other.cpf != null)
+		if (usuario.getCpf() == null) {
+			if (other.getUsuario().getCpf() != null)
 				return false;
-		} else if (!cpf.equals(other.cpf))
+		} else if (!usuario.getCpf().equals(other.getUsuario().getCpf()))
 			return false;
 		return true;
 	}

@@ -1,11 +1,9 @@
 package ufc.quixada.npi.afastamento.service;
 
-import br.ufc.quixada.npi.ldap.model.Usuario;
+import ufc.quixada.npi.afastamento.model.Usuario;
 
 public interface UserService {
 	
 	Usuario getByCpf(String cpf);
-	
-	boolean isAdministrador(String cpf);
 
 }

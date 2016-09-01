@@ -6,13 +6,14 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.servlet.http.HttpSession;
 
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import ufc.quixada.npi.afastamento.model.Acao;
@@ -46,18 +47,18 @@ public class DocenteController {
 	private ProfessorService professorService;
 	
 	@RequestMapping(value = "/incluir", method = RequestMethod.GET)
-	public String incluirForm(Model model, HttpSession session) {
+	public String incluirForm(Model model, Authentication auth) {
 		model.addAttribute("reserva", new Reserva());
-		model.addAttribute("professor", getProfessorLogado(session));
+		model.addAttribute("professor", professorService.getByCpf(auth.getName()));
 		model.addAttribute("programa", Programa.values());
 		return Constants.PAGINA_INCLUIR_RESERVA;
 	}
 
 	@RequestMapping(value = "/incluir", method = RequestMethod.POST)
-	public String incluir(@ModelAttribute("reserva") Reserva reserva, Model model, RedirectAttributes redirect, HttpSession session) {
+	public String incluir(@ModelAttribute("reserva") Reserva reserva, Model model, RedirectAttributes redirect, Authentication auth) {
 
 		model.addAttribute("reserva", reserva);
-		model.addAttribute("professor", getProfessorLogado(session));
+		model.addAttribute("professor", professorService.getByCpf(auth.getName()));
 		model.addAttribute("programa", Programa.values());
 
 		if (reserva.getAnoInicio() == null || reserva.getAnoTermino() == null) {
@@ -89,13 +90,13 @@ public class DocenteController {
 		}
 		
 		List<Reserva> reservas = reservaService
-				.getReservasByStatusReservaAndProfessor(StatusReserva.EM_ESPERA, getProfessorLogado(session));
+				.getReservasByStatusReservaAndProfessor(StatusReserva.EM_ESPERA, professorService.getByCpf(auth.getName()));
 		
 		if (reservas != null && !reservas.isEmpty()) {
 			model.addAttribute(Constants.ERRO, Constants.MSG_RESERVA_EM_ESPERA);
 			return Constants.PAGINA_INCLUIR_RESERVA;
 		}
-		reserva.setProfessor(getProfessorLogado(session));
+		reserva.setProfessor(professorService.getByCpf(auth.getName()));
 		reserva.setStatus(StatusReserva.EM_ESPERA);
 		reserva.setDataSolicitacao(new Date());
 
@@ -110,9 +111,9 @@ public class DocenteController {
 	}
 	
 	@RequestMapping(value = "/editar/{id}", method = RequestMethod.GET)
-	public String editarForm(@PathVariable("id") Long id, Model model, HttpSession session, RedirectAttributes redirect) {
+	public String editarForm(@PathVariable("id") Long id, Model model, Authentication auth, RedirectAttributes redirect) {
 		Reserva reserva = reservaService.find(Reserva.class, id);
-		Professor professor = getProfessorLogado(session);
+		Professor professor = professorService.getByCpf(auth.getName());
 		if (reserva == null || !reserva.getProfessor().equals(professor) || !reserva.getStatus().equals(StatusReserva.EM_ESPERA)) {
 			redirect.addFlashAttribute(Constants.ERRO, Constants.MSG_PERMISSAO_NEGADA);
 			return Constants.REDIRECT_PAGINA_MINHAS_RESERVAS;
@@ -176,8 +177,8 @@ public class DocenteController {
 	}
 
 	@RequestMapping(value = "/minhas-reservas", method = RequestMethod.GET)
-	public String listar(Model model, HttpSession session) {
-		Professor professor = getProfessorLogado(session);
+	public String listar(Model model, Authentication auth) {
+		Professor professor = professorService.getByCpf(auth.getName());
 		Periodo periodo = periodoService.getPeriodoAtual();
 
 		model.addAttribute("periodo", periodo);
@@ -186,26 +187,38 @@ public class DocenteController {
 		return Constants.PAGINA_MINHAS_RESERVAS;
 	}
 	
+	@RequestMapping(value = "/excluir/{id}", method = RequestMethod.GET)
+	public String excluir(@PathVariable("id") Long id, Authentication auth, RedirectAttributes redirect) {
+		Reserva reserva = reservaService.getReservaById(id);
+		Professor professor = professorService.getByCpf(auth.getName());
+		if (reserva == null || !reserva.getProfessor().equals(professor) || !reserva.getStatus().equals(StatusReserva.EM_ESPERA)) {
+			redirect.addFlashAttribute(Constants.ERRO, Constants.MSG_PERMISSAO_NEGADA);
+		} else {
+			reservaService.delete(reserva);
+			notificacaoService.notificar(reserva, Notificacao.RESERVA_EXCLUIDA, AutorAcao.PROFESSOR);
+			redirect.addFlashAttribute(Constants.INFO, Constants.MSG_RESERVA_EXCLUIDA);
+		}
+		return Constants.REDIRECT_PAGINA_MINHAS_RESERVAS;
+	}
+	
+	@RequestMapping(value = "/cancelar", method = RequestMethod.POST)
+	public String cancelar(@RequestParam("id") Long id, @RequestParam("motivo") String motivo, Authentication auth, RedirectAttributes redirect) {
+		Reserva reserva = reservaService.getReservaById(id);
+		Professor professor = professorService.getByCpf(auth.getName());
+		if (reserva == null || !reserva.getProfessor().equals(professor) || !reserva.getStatus().equals(StatusReserva.ABERTO)) {
+			redirect.addFlashAttribute(Constants.ERRO, Constants.MSG_PERMISSAO_NEGADA);
+		} else {
+			reserva.setStatus(StatusReserva.CANCELADO);
+			reservaService.update(reserva);
+			reservaService.salvarHistorico(reserva, Acao.CANCELAMENTO, AutorAcao.PROFESSOR, motivo);
+			notificacaoService.notificar(reserva, Notificacao.RESERVA_CANCELADA, AutorAcao.PROFESSOR);
+			redirect.addFlashAttribute(Constants.INFO, Constants.MSG_RESERVA_CANCELADA);
+		}
+		return Constants.REDIRECT_PAGINA_MINHAS_RESERVAS;
+	}
+	
 	private Integer calculaSemestres(Integer anoInicio, Integer semestreInicio, Integer anoTermino, Integer semestreTermino) {
 		return ((anoTermino - anoInicio) * 2) + (semestreTermino - semestreInicio);
 	}
 	
-	private Professor getProfessorLogado(HttpSession session) {
-		Professor professor = null;
-		if (session.getAttribute(Constants.PROFESSOR_LOGADO) == null) {
-			professor = professorService.getByCpf(getUsuarioLogado(session));
-			session.setAttribute(Constants.PROFESSOR_LOGADO, professor);
-		} else {
-			professor = (Professor) session.getAttribute(Constants.PROFESSOR_LOGADO);
-		}
-		return professor;
-	}
-	
-	private String getUsuarioLogado(HttpSession session) {
-		if (session.getAttribute(Constants.USUARIO_LOGADO) == null) {
-			session.setAttribute(Constants.USUARIO_LOGADO, SecurityContextHolder.getContext().getAuthentication().getName());
-		}
-		return (String) session.getAttribute(Constants.USUARIO_LOGADO);
-	}
-
 }

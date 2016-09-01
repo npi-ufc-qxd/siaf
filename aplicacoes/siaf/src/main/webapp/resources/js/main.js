@@ -111,7 +111,7 @@ $(document).ready(function() {
 		e.preventDefault();
 		var idReserva = $(this).data('id');
 		var status = $('#homologar-reserva-' + idReserva).find('#status-' + idReserva).val();
-		if (status.contains('CANCELADO') || status.contains('NEGADO')) {
+		if (status == 'CANCELADO' || status == 'NEGADO' || status == 'CANCELADO_COM_PUNICAO') {
 			$('#cancelar-reserva').modal('show');
 			$('#cancelar-reserva').find('#status').val(status);
 			$('#cancelar-reserva').find('#idReserva').val(idReserva);

@@ -29,9 +29,8 @@
  		<intercept-url pattern="/webjars/**" access="IS_AUTHENTICATED_ANONYMOUSLY" /> 		
  		<intercept-url pattern="/resources/**" access="IS_AUTHENTICATED_ANONYMOUSLY" />
  		<intercept-url pattern="/docente/**" access="DOCENTE" />
-		<intercept-url pattern="/administracao/**" access="ADMIN-SIAF" />
-		<intercept-url pattern="/relatorio/**" access="ADMIN-SIAF, DOCENTE" />
-		<intercept-url pattern="/**" access="ADMIN-SIAF, DOCENTE" />	
+		<intercept-url pattern="/administracao/**" access="ADMINISTRACAO" />
+		<intercept-url pattern="/**" access="ADMINISTRACAO, DOCENTE" />	
  		
  		<form-login login-page="/login" authentication-success-handler-ref="myAuthenticationSuccessHandler" 
  			authentication-failure-url="/loginfailed" />
@@ -40,7 +39,7 @@
  	
  	<beans:bean id="myAuthenticationSuccessHandler" class="ufc.quixada.npi.afastamento.service.SimpleUrlAuthenticationSuccessHandler" />
  	
- 	<beans:bean id="ldapAuthenticationProvider" class="br.ufc.quixada.npi.ldap.service.LdapAuthenticationProvider"></beans:bean>
+ 	<beans:bean id="ldapAuthenticationProvider" class="ufc.quixada.npi.afastamento.service.SiafAuthenticationProvider"></beans:bean>
  
 		<authentication-manager alias="authenticationManager">
 		    <authentication-provider ref="ldapAuthenticationProvider"></authentication-provider>

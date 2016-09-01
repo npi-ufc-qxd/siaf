@@ -18,7 +18,7 @@
 		<div id="content">
 			<div class="title">Edite sua reserva de afastamento :</div>
 			<span class="line"></span>
-			<form:form id="formEditarReserva" commandName="reserva" action="/siaf/reserva/editar"
+			<form:form id="formEditarReserva" commandName="reserva" servletRelativeAction="/docente/editar"
 				method="POST"  class="form-horizontal">
 				<input type="hidden" id="id" name="id" value="${reserva.id }"/>
 				
@@ -35,11 +35,11 @@
 				<div class="form-group">
 					<label class="col-sm-2 control-label">Nome:</label>
 					<div class="col-sm-4">
-						<label class="control-label value-label">${reserva.professor.nome }</label>
+						<label class="control-label value-label">${reserva.professor.usuario.nome }</label>
 					</div>
 					<label class="col-sm-2 control-label">Siape:</label>
 					<div class="col-sm-4">
-						<label class="control-label value-label">${reserva.professor.siape }</label>
+						<label class="control-label value-label">${reserva.professor.usuario.siape }</label>
 					</div>
 				</div>
 				<div class="form-group">

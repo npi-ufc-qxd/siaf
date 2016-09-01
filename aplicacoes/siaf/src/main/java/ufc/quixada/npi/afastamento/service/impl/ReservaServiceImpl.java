@@ -80,16 +80,16 @@ public class ReservaServiceImpl extends GenericServiceImpl<Reserva> implements R
 	@Override
 	public List<Reserva> getReservasByProfessor(Professor professor) {
 		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("cpf", professor.getCpf());
+		params.put("cpf", professor.getUsuario().getCpf());
 		return reservaRepository.find(QueryType.JPQL,
-				"from Reserva where professor.cpf = :cpf order by dataSolicitacao DESC", params);
+				"from Reserva where professor.usuario.cpf = :cpf order by dataSolicitacao DESC", params);
 	}
 
 	@Override
 	public boolean hasReservaEmAberto(Professor professor) {
 		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("cpf", professor.getCpf());
-		return reservaRepository.find(QueryType.JPQL, "from Reserva where status = 'ABERTO' and professor.cpf = :cpf",
+		params.put("cpf", professor.getUsuario().getCpf());
+		return reservaRepository.find(QueryType.JPQL, "from Reserva where status = 'ABERTO' and professor.usuario.cpf = :cpf",
 				params).size() > 0;
 	}
 
@@ -101,11 +101,11 @@ public class ReservaServiceImpl extends GenericServiceImpl<Reserva> implements R
 	@Override
 	public List<Reserva> getReservasAnterioresComPunicao(Professor professor, Periodo periodo) {
 		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("cpf", professor.getCpf());
+		params.put("cpf", professor.getUsuario().getCpf());
 		params.put("ano", periodo.getAno());
 		params.put("semestre", periodo.getSemestre());
 		params.put("status", StatusReserva.CANCELADO_COM_PUNICAO);
-		return reservaRepository.find(QueryType.JPQL, "from Reserva where status = :status and professor.cpf = :cpf and (anoTermino < :ano or (anoTermino = :ano and semestreTermino < :semestre))", params);
+		return reservaRepository.find(QueryType.JPQL, "from Reserva where status = :status and professor.usuario.cpf = :cpf and (anoTermino < :ano or (anoTermino = :ano and semestreTermino < :semestre))", params);
 	}
 
 	@Override

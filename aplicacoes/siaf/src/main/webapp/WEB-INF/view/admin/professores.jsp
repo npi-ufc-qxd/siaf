@@ -54,11 +54,11 @@
 						<c:forEach items="${professores}" var="professor">
 							<input type="hidden" value="${professor.semestreAdmissao }" id="semestreAdmissao"/>
 							<tr>
-								<td class="align-center">${professor.siape}</td>
-								<td>${professor.nome}</td>
-								<td>${professor.email}</td>
+								<td class="align-center">${professor.usuario.siape}</td>
+								<td>${professor.usuario.nome}</td>
+								<td>${professor.usuario.email}</td>
 								<td class="align-center">
-									<fmt:formatDate pattern="dd/MM/yyyy" value="${professor.dataNascimento }" />
+									<fmt:formatDate pattern="dd/MM/yyyy" value="${professor.usuario.nascimento }" />
 								</td>
 								<td class="align-center">
 									<c:if test="${empty professor.anoAdmissao}">-</c:if>
@@ -69,7 +69,7 @@
 								<td  class="align-center">
 									<a title="Editar" href="#">
 										<button class="btn btn-default editar-admissao" data-id="${professor.id }" 
-											data-nome="${professor.nome }" data-ano="${professor.anoAdmissao }" 
+											data-nome="${professor.usuario.nome }" data-ano="${professor.anoAdmissao }" 
 											data-semestre="${professor.semestreAdmissao }">
 											<i class="fa fa-pencil"></i>
 										</button>

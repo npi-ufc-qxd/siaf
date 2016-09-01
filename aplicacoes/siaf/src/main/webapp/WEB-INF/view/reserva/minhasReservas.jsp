@@ -41,11 +41,11 @@
 				<div class="form-group">
 					<label class="col-sm-2 control-label">Nome:</label>
 					<div class="col-sm-4">
-						<label class="control-label value-label">${professor.nome }</label>
+						<label class="control-label value-label">${professor.usuario.nome }</label>
 					</div>
 					<label class="col-sm-2 control-label">Siape:</label>
 					<div class="col-sm-4">
-						<label class="control-label value-label">${professor.siape }</label>
+						<label class="control-label value-label">${professor.usuario.siape }</label>
 					</div>
 				</div>
 				<div class="form-group">
@@ -56,7 +56,7 @@
 					<label class="col-sm-2 control-label">Data de nascimento:</label>
 					<div class="col-sm-4">
 						<label class="control-label value-label"><fmt:formatDate pattern="dd/MM/yyyy"
-								value="${professor.dataNascimento }" /></label>
+								value="${professor.usuario.nascimento }" /></label>
 					</div>
 				</div>
 
@@ -102,12 +102,12 @@
 											</a>
                                         </c:if>
                                         <c:if test="${reserva.status eq 'EM_ESPERA' }">
-											<a class="btn btn-default btn-sm" title="Editar" href="<c:url value="/reserva/editar/${reserva.id }"/>">
+											<a class="btn btn-default btn-sm" title="Editar" href="<c:url value="/docente/editar/${reserva.id }"/>">
 												<i class="fa fa-pencil"></i>
 											</a>
 											<a title="Excluir" data-toggle="modal"
 												data-target="#excluir-reserva" href="#"
-												data-href="<c:url value="/reserva/excluir/${reserva.id}"></c:url>"
+												data-href="<c:url value="/docente/excluir/${reserva.id}"></c:url>"
 												data-name="${reserva.anoInicio}.${reserva.semestreInicio} a ${reserva.anoTermino}.${reserva.semestreTermino}">
 												<button class="btn btn-warning btn-sm">
 													<i class="fa fa-trash-o"></i>
@@ -154,7 +154,7 @@
 						</button>
 						<h4 class="modal-title" id="cancelarModalLabel">Cancelar</h4>
 					</div>
-					<form id="formCancelarReserva" action="/siaf/reserva/cancelar" method="POST">
+					<form id="formCancelarReserva" action="<c:url value="/docente/cancelar"/>" method="POST">
 						<div class="modal-body">
 							<span class="msg-alert">ATENÇÃO: essa ação não poderá ser desfeita!</span><br/>
 							Tem certeza de que deseja cancelar essa reserva?<br/><br/>

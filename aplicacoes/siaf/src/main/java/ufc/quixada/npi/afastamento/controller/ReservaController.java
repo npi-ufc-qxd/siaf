@@ -10,29 +10,21 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.http.MediaType;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import ufc.quixada.npi.afastamento.model.Acao;
-import ufc.quixada.npi.afastamento.model.AutorAcao;
-import ufc.quixada.npi.afastamento.model.Notificacao;
 import ufc.quixada.npi.afastamento.model.Periodo;
-import ufc.quixada.npi.afastamento.model.Professor;
 import ufc.quixada.npi.afastamento.model.Ranking;
 import ufc.quixada.npi.afastamento.model.Reserva;
 import ufc.quixada.npi.afastamento.model.StatusPeriodo;
 import ufc.quixada.npi.afastamento.model.StatusReserva;
 import ufc.quixada.npi.afastamento.model.TuplaRanking;
-import ufc.quixada.npi.afastamento.service.NotificacaoService;
 import ufc.quixada.npi.afastamento.service.PeriodoService;
-import ufc.quixada.npi.afastamento.service.ProfessorService;
 import ufc.quixada.npi.afastamento.service.RankingService;
 import ufc.quixada.npi.afastamento.service.ReservaService;
 import ufc.quixada.npi.afastamento.util.Constants;
@@ -49,12 +41,6 @@ public class ReservaController {
 
 	@Inject
 	private PeriodoService periodoService;
-
-	@Inject
-	private ProfessorService professorService;
-
-	@Inject
-	private NotificacaoService notificacaoService;
 
 	@RequestMapping(value = "/ranking", method = RequestMethod.GET)
 	public String getRanking(Model model, HttpSession session) {
@@ -131,54 +117,6 @@ public class ReservaController {
 		List<Reserva> reservas = reservaService.getAllReservas();
 		model.addAttribute("reservas", reservas);
 		return Constants.PAGINA_LISTAR_RESERVAS;
-	}
-
-	@RequestMapping(value = "/excluir/{id}", method = RequestMethod.GET)
-	public String excluir(@PathVariable("id") Long id, HttpSession session, RedirectAttributes redirect) {
-		Reserva reserva = reservaService.getReservaById(id);
-		Professor professor = getProfessorLogado(session);
-		if (reserva == null || !reserva.getProfessor().equals(professor) || !reserva.getStatus().equals(StatusReserva.EM_ESPERA)) {
-			redirect.addFlashAttribute(Constants.ERRO, Constants.MSG_PERMISSAO_NEGADA);
-		} else {
-			reservaService.delete(reserva);
-			notificacaoService.notificar(reserva, Notificacao.RESERVA_EXCLUIDA, AutorAcao.PROFESSOR);
-			redirect.addFlashAttribute(Constants.INFO, Constants.MSG_RESERVA_EXCLUIDA);
-		}
-		return Constants.REDIRECT_PAGINA_MINHAS_RESERVAS;
-	}
-	
-	@RequestMapping(value = "/cancelar", method = RequestMethod.POST)
-	public String cancelar(@RequestParam("id") Long id, @RequestParam("motivo") String motivo, HttpSession session, RedirectAttributes redirect) {
-		Reserva reserva = reservaService.getReservaById(id);
-		Professor professor = getProfessorLogado(session);
-		if (reserva == null || !reserva.getProfessor().equals(professor) || !reserva.getStatus().equals(StatusReserva.ABERTO)) {
-			redirect.addFlashAttribute(Constants.ERRO, Constants.MSG_PERMISSAO_NEGADA);
-		} else {
-			reserva.setStatus(StatusReserva.CANCELADO);
-			reservaService.update(reserva);
-			reservaService.salvarHistorico(reserva, Acao.CANCELAMENTO, AutorAcao.PROFESSOR, motivo);
-			notificacaoService.notificar(reserva, Notificacao.RESERVA_CANCELADA, AutorAcao.PROFESSOR);
-			redirect.addFlashAttribute(Constants.INFO, Constants.MSG_RESERVA_CANCELADA);
-		}
-		return Constants.REDIRECT_PAGINA_MINHAS_RESERVAS;
-	}
-
-	private String getUsuarioLogado(HttpSession session) {
-		if (session.getAttribute(Constants.USUARIO_LOGADO) == null) {
-			session.setAttribute(Constants.USUARIO_LOGADO, SecurityContextHolder.getContext().getAuthentication().getName());
-		}
-		return (String) session.getAttribute(Constants.USUARIO_LOGADO);
-	}
-
-	private Professor getProfessorLogado(HttpSession session) {
-		Professor professor = null;
-		if (session.getAttribute(Constants.PROFESSOR_LOGADO) == null) {
-			professor = professorService.getByCpf(getUsuarioLogado(session));
-			session.setAttribute(Constants.PROFESSOR_LOGADO, professor);
-		} else {
-			professor = (Professor) session.getAttribute(Constants.PROFESSOR_LOGADO);
-		}
-		return professor;
 	}
 
 }

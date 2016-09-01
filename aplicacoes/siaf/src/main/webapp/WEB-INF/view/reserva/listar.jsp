@@ -73,7 +73,7 @@
 										<c:otherwise><span class="label label-danger">${reserva.status}</span></c:otherwise>
 									</c:choose>
 								</td>
-								<td>${reserva.professor.nome}</td>
+								<td>${reserva.professor.usuario.nome}</td>
 								<td>${reserva.anoInicio}.${reserva.semestreInicio} a ${reserva.anoTermino }.${reserva.semestreTermino }</td>
 
 								<td class="align-center">${reserva.programa.descricao}</td>
@@ -84,7 +84,7 @@
 											<i class="fa fa-info-circle"></i>
 										</button>
 									</a>
-                                    <sec:authorize ifAnyGranted="ADMIN-SIAF">
+                                    <sec:authorize ifAnyGranted="ADMINISTRACAO">
                                    		<c:if test="${reserva.status eq 'ABERTO' or reserva.status == 'EM_ESPERA'}">
 	                                   		<a title="Editar" href="<c:url value="/administracao/editar-reserva/${reserva.id }" />" class="btn btn-default btn-sm">
 												<i class="fa fa-pencil"></i>

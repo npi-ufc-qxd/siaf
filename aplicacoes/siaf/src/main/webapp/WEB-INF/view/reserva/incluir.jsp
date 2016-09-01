@@ -29,11 +29,11 @@
 				<div class="form-group">
 					<label class="col-sm-2 control-label">Nome:</label>
 					<div class="col-sm-4">
-						<label class="control-label value-label">${professor.nome }</label>
+						<label class="control-label value-label">${professor.usuario.nome }</label>
 					</div>
 					<label class="col-sm-2 control-label">Siape:</label>
 					<div class="col-sm-4">
-						<label class="control-label value-label">${professor.siape }</label>
+						<label class="control-label value-label">${professor.usuario.siape }</label>
 					</div>
 				</div>
 				<div class="form-group">

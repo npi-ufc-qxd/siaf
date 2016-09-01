@@ -86,7 +86,7 @@ public class NotificacaoServiceImpl implements NotificacaoService {
 							SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 				
 							if (tipoNotificacao == Notificacao.RESERVA_INCLUIDA) {
-								String texto = properties.getProperty(RESERVA_INCLUIDA).replaceAll(PROFESSOR, reserva.getProfessor().getNome())
+								String texto = properties.getProperty(RESERVA_INCLUIDA).replaceAll(PROFESSOR, reserva.getProfessor().getUsuario().getNome())
 										.replaceAll(INICIO_PERIODO, inicioPeriodo).replaceAll(TERMINO_PERIODO, terminoPeriodo)
 										.replaceAll(PROGRAMA, reserva.getPrograma().getDescricao())
 										.replaceAll(CONCEITO, reserva.getConceitoPrograma().toString())
@@ -97,10 +97,10 @@ public class NotificacaoServiceImpl implements NotificacaoService {
 									texto = texto.replaceAll(INSTITUICAO, reserva.getInstituicao());
 								}
 								email.setText(texto);
-								email.setTo(reserva.getProfessor().getEmail());
+								email.setTo(reserva.getProfessor().getUsuario().getEmail());
 								emailService.sendEmail(email);
 							} else if (tipoNotificacao == Notificacao.RESERVA_EXCLUIDA) {
-								String texto = properties.getProperty(RESERVA_EXCLUIDA).replaceAll(PROFESSOR, reserva.getProfessor().getNome())
+								String texto = properties.getProperty(RESERVA_EXCLUIDA).replaceAll(PROFESSOR, reserva.getProfessor().getUsuario().getNome())
 										.replaceAll(INICIO_PERIODO, inicioPeriodo).replaceAll(TERMINO_PERIODO, terminoPeriodo)
 										.replaceAll(PROGRAMA, reserva.getPrograma().getDescricao())
 										.replaceAll(CONCEITO, reserva.getConceitoPrograma().toString())
@@ -117,10 +117,10 @@ public class NotificacaoServiceImpl implements NotificacaoService {
 									texto = texto.replaceAll(AUTOR, "O Administrador do sistema");
 								}
 								email.setText(texto);
-								email.setTo(reserva.getProfessor().getEmail());
+								email.setTo(reserva.getProfessor().getUsuario().getEmail());
 								emailService.sendEmail(email);
 							} else if (tipoNotificacao == Notificacao.RESERVA_ALTERADA) {
-								String texto = properties.getProperty(RESERVA_ALTERADA).replaceAll(PROFESSOR, reserva.getProfessor().getNome())
+								String texto = properties.getProperty(RESERVA_ALTERADA).replaceAll(PROFESSOR, reserva.getProfessor().getUsuario().getNome())
 										.replaceAll(INICIO_PERIODO, inicioPeriodo).replaceAll(TERMINO_PERIODO, terminoPeriodo)
 										.replaceAll(PROGRAMA, reserva.getPrograma().getDescricao())
 										.replaceAll(CONCEITO, reserva.getConceitoPrograma().toString())
@@ -137,11 +137,11 @@ public class NotificacaoServiceImpl implements NotificacaoService {
 									texto = texto.replaceAll(AUTOR, "O Administrador do sistema");
 								}
 								email.setText(texto);
-								email.setTo(reserva.getProfessor().getEmail());
+								email.setTo(reserva.getProfessor().getUsuario().getEmail());
 								emailService.sendEmail(email);
 							} else if (tipoNotificacao == Notificacao.RESERVA_INCLUIDA_RANKING) {
 								Historico historico = reservaService.getUltimaAcao(reserva, Acao.INCLUSAO_RANKING);
-								String texto = properties.getProperty(RESERVA_INCLUIDA_RANKING).replaceAll(PROFESSOR, reserva.getProfessor().getNome())
+								String texto = properties.getProperty(RESERVA_INCLUIDA_RANKING).replaceAll(PROFESSOR, reserva.getProfessor().getUsuario().getNome())
 										.replaceAll(INICIO_PERIODO, inicioPeriodo).replaceAll(TERMINO_PERIODO, terminoPeriodo)
 										.replaceAll(PROGRAMA, reserva.getPrograma().getDescricao())
 										.replaceAll(CONCEITO, reserva.getConceitoPrograma().toString())
@@ -153,11 +153,11 @@ public class NotificacaoServiceImpl implements NotificacaoService {
 									texto = texto.replaceAll(INSTITUICAO, reserva.getInstituicao());
 								}
 								email.setText(texto);
-								email.setTo(reserva.getProfessor().getEmail());
+								email.setTo(reserva.getProfessor().getUsuario().getEmail());
 								emailService.sendEmail(email);
 							} else if (tipoNotificacao == Notificacao.RESERVA_CANCELADA) {
 								Historico historico = reservaService.getUltimaAcao(reserva, Acao.CANCELAMENTO);
-								String texto = properties.getProperty(RESERVA_CANCELADA).replaceAll(PROFESSOR, reserva.getProfessor().getNome())
+								String texto = properties.getProperty(RESERVA_CANCELADA).replaceAll(PROFESSOR, reserva.getProfessor().getUsuario().getNome())
 										.replaceAll(INICIO_PERIODO, inicioPeriodo).replaceAll(TERMINO_PERIODO, terminoPeriodo)
 										.replaceAll(PROGRAMA, reserva.getPrograma().getDescricao())
 										.replaceAll(CONCEITO, reserva.getConceitoPrograma().toString())
@@ -177,10 +177,10 @@ public class NotificacaoServiceImpl implements NotificacaoService {
 									texto = texto.replaceAll(AUTOR, "O Administrador do sistema");
 								}
 								email.setText(texto);
-								email.setTo(reserva.getProfessor().getEmail());
+								email.setTo(reserva.getProfessor().getUsuario().getEmail());
 								emailService.sendEmail(email);
 							} else if (tipoNotificacao == Notificacao.RESERVA_HOMOLOGADA) {
-								String texto = properties.getProperty(RESERVA_HOMOLOGADA).replaceAll(PROFESSOR, reserva.getProfessor().getNome())
+								String texto = properties.getProperty(RESERVA_HOMOLOGADA).replaceAll(PROFESSOR, reserva.getProfessor().getUsuario().getNome())
 										.replaceAll(INICIO_PERIODO, inicioPeriodo).replaceAll(TERMINO_PERIODO, terminoPeriodo)
 										.replaceAll(PROGRAMA, reserva.getPrograma().getDescricao())
 										.replaceAll(CONCEITO, reserva.getConceitoPrograma().toString())
@@ -206,14 +206,14 @@ public class NotificacaoServiceImpl implements NotificacaoService {
 									texto = texto.replaceAll(CANCELAMENTO, "");
 								}
 								email.setText(texto);
-								email.setTo(reserva.getProfessor().getEmail());
+								email.setTo(reserva.getProfessor().getUsuario().getEmail());
 								emailService.sendEmail(email);
 							} else if (tipoNotificacao == Notificacao.ADMISSAO_ALTERADA) {
-								String texto = properties.getProperty(ADMISSAO_ALTERADA).replaceAll(PROFESSOR, reserva.getProfessor().getNome())
+								String texto = properties.getProperty(ADMISSAO_ALTERADA).replaceAll(PROFESSOR, reserva.getProfessor().getUsuario().getNome())
 										.replaceAll(ANO_ADMISSAO, reserva.getProfessor().getAnoAdmissao().toString())
 										.replaceAll(SEMESTRE_ADMISSAO, reserva.getProfessor().getSemestreAdmissao().toString());
 								email.setText(texto);
-								email.setTo(reserva.getProfessor().getEmail());
+								email.setTo(reserva.getProfessor().getUsuario().getEmail());
 								emailService.sendEmail(email);
 							}
 						} catch (MessagingException e) {

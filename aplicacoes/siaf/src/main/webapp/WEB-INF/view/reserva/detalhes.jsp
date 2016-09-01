@@ -16,7 +16,7 @@
 		<div id="content">
 			
 			<div class="form-horizontal">
-				<div class="title">Professor : ${reserva.professor.nome }</div>
+				<div class="title">Professor : ${reserva.professor.usuario.nome }</div>
 				<span class="line"></span>
 				<div class="form-group">
 					<label class="col-sm-2 control-label">Período:</label>
@@ -66,7 +66,7 @@
 								<td>
 									<c:choose>
 										<c:when test="${historico.autor == 'SISTEMA' }"><c:set var="autor" value="O Sistema"></c:set></c:when>
-										<c:when test="${historico.autor == 'PROFESSOR' }"><c:set var="autor" value="${reserva.professor.nome }"></c:set> </c:when>
+										<c:when test="${historico.autor == 'PROFESSOR' }"><c:set var="autor" value="${reserva.professor.usuario.nome }"></c:set> </c:when>
 										<c:when test="${historico.autor == 'ADMINISTRADOR' }"><c:set var="autor" value="O Administrador"></c:set> </c:when>
 									</c:choose>
 									<c:choose>

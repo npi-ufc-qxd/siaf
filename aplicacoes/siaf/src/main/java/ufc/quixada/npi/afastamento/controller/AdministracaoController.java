@@ -78,11 +78,12 @@ public class AdministracaoController {
 		for (Usuario usuario : usuarios) {
 			Professor professor = professorService.getByCpf(usuario.getCpf());
 			if (professor == null) {
+				ufc.quixada.npi.afastamento.model.Usuario usuarioSiaf = new ufc.quixada.npi.afastamento.model.Usuario();
+				usuarioSiaf.setCpf(usuario.getCpf());
+				usuarioSiaf.setHabilitado(true);
 				professor = new Professor();
-				professor.setCpf(usuario.getCpf());
+				professor.setUsuario(usuarioSiaf);
 				professorService.save(professor);
-				Reserva reserva = new Reserva();
-				reserva.setProfessor(professor);
 			}
 		}
 
@@ -217,7 +218,7 @@ public class AdministracaoController {
 		professorService.update(professor);
 
 		model.addAttribute("professores", professorService.findAtivos());
-		model.addAttribute("info", "Data de admissão do(a) Prof(a) " + professor.getNome() + " atualizada com sucesso.");
+		model.addAttribute("info", "Data de admissão do(a) Prof(a) " + professor.getUsuario().getNome() + " atualizada com sucesso.");
 
 		Reserva reserva = new Reserva();
 		reserva.setProfessor(professor);

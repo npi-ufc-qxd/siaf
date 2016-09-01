@@ -23,10 +23,10 @@ public class AfastamentoServiceImpl extends GenericServiceImpl<Afastamento> impl
 	@Override
 	public List<Afastamento> getAfastamentosAnteriores(Reserva reserva) {
 		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("cpf", reserva.getProfessor().getCpf());
+		params.put("cpf", reserva.getProfessor().getUsuario().getCpf());
 		params.put("anoInicio", reserva.getAnoInicio());
 		params.put("semestreInicio", reserva.getSemestreInicio());
-		List<Afastamento> afs = afastamentoRepository.find(QueryType.JPQL, "from Afastamento where reserva.professor.cpf = :cpf "
+		List<Afastamento> afs = afastamentoRepository.find(QueryType.JPQL, "from Afastamento where reserva.professor.usuario.cpf = :cpf "
 				+ "and (reserva.anoInicio < :anoInicio or (reserva.anoInicio = :anoInicio and reserva.semestreInicio < :semestreInicio))", params);
 		return afs;
 	}

@@ -60,8 +60,8 @@ public class RankingServiceImpl implements RankingService {
 					if (tupla1.getReserva().getPrograma().equals(tupla2.getReserva().getPrograma())) {
 						if (tupla1.getReserva().getConceitoPrograma().equals(tupla2.getReserva().getConceitoPrograma())) {
 							
-							return tupla1.getReserva().getProfessor().getDataNascimento()
-									.compareTo(tupla2.getReserva().getProfessor().getDataNascimento());
+							return tupla1.getReserva().getProfessor().getUsuario().getNascimento()
+									.compareTo(tupla2.getReserva().getProfessor().getUsuario().getNascimento());
 						}
 						return tupla2.getReserva().getConceitoPrograma().compareTo(tupla1.getReserva().getConceitoPrograma());
 					}
@@ -188,9 +188,11 @@ public class RankingServiceImpl implements RankingService {
 				if (tupla1.getPontuacao().compareTo(tupla2.getPontuacao()) == 0.0f) {
 					if (tupla1.getReserva().getPrograma().equals(tupla2.getReserva().getPrograma())) {
 						if (tupla1.getReserva().getConceitoPrograma().equals(tupla2.getReserva().getConceitoPrograma())) {
-							
-							return tupla1.getReserva().getProfessor().getDataNascimento()
-									.compareTo(tupla2.getReserva().getProfessor().getDataNascimento());
+							System.out.println(tupla2.getReserva().getProfessor().getId());
+							System.out.println(tupla2.getReserva().getProfessor().getUsuario().getId());
+							System.out.println(tupla2.getReserva().getProfessor().getUsuario().getNascimento());
+							return tupla1.getReserva().getProfessor().getUsuario().getNascimento()
+									.compareTo(tupla2.getReserva().getProfessor().getUsuario().getNascimento());
 						}
 						return tupla2.getReserva().getConceitoPrograma().compareTo(tupla1.getReserva().getConceitoPrograma());
 					}
@@ -277,7 +279,7 @@ public class RankingServiceImpl implements RankingService {
 			for (Reserva reserva : reservas) {
 				TuplaRanking tupla = new TuplaRanking();
 				tupla.setReserva(reserva);
-				tupla.setProfessor(reserva.getProfessor().getNome());
+				tupla.setProfessor(reserva.getProfessor().getUsuario().getNome());
 				tupla.setPeriodo(periodo);
 				if (StatusReserva.CANCELADO.equals(statusReserva))
 					tupla.setStatus(StatusTupla.CANCELADO);
@@ -299,7 +301,7 @@ public class RankingServiceImpl implements RankingService {
 			TuplaRanking tupla = new TuplaRanking();
 			tupla.setReserva(reserva);
 			tupla.setPeriodo(periodo);
-			tupla.setProfessor(reserva.getProfessor().getNome());
+			tupla.setProfessor(reserva.getProfessor().getUsuario().getNome());
 			tupla.setSs(getSemestresSolicitados(reserva));
 			tupla.setT(calculaSemestres(reserva.getProfessor().getAnoAdmissao(), reserva.getProfessor().getSemestreAdmissao(),
 					reserva.getAnoInicio(), reserva.getSemestreInicio()) - 1);
