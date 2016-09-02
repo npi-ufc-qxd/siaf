@@ -1,150 +1,152 @@
 package ufc.quixada.npi.afastamento.service.impl;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import ufc.quixada.npi.afastamento.model.Acao;
+import ufc.quixada.npi.afastamento.model.Afastamento;
 import ufc.quixada.npi.afastamento.model.AutorAcao;
 import ufc.quixada.npi.afastamento.model.Historico;
 import ufc.quixada.npi.afastamento.model.Periodo;
 import ufc.quixada.npi.afastamento.model.Professor;
+import ufc.quixada.npi.afastamento.model.Programa;
 import ufc.quixada.npi.afastamento.model.Reserva;
 import ufc.quixada.npi.afastamento.model.StatusPeriodo;
 import ufc.quixada.npi.afastamento.model.StatusReserva;
+import ufc.quixada.npi.afastamento.repository.HistoricoRepository;
+import ufc.quixada.npi.afastamento.repository.PeriodoRespository;
+import ufc.quixada.npi.afastamento.repository.ReservaRepository;
+import ufc.quixada.npi.afastamento.service.AfastamentoService;
 import ufc.quixada.npi.afastamento.service.PeriodoService;
 import ufc.quixada.npi.afastamento.service.ProfessorService;
 import ufc.quixada.npi.afastamento.service.ReservaService;
-import br.ufc.quixada.npi.enumeration.QueryType;
-import br.ufc.quixada.npi.repository.GenericRepository;
-import br.ufc.quixada.npi.service.impl.GenericServiceImpl;
+import ufc.quixada.npi.afastamento.util.Constants;
+import ufc.quixada.npi.afastamento.util.SiafException;
 
 @Named
-public class ReservaServiceImpl extends GenericServiceImpl<Reserva> implements ReservaService {
+public class ReservaServiceImpl implements ReservaService {
 
 	@Inject
-	private GenericRepository<Reserva> reservaRepository;
+	private ReservaRepository reservaRepository;
 
 	@Inject
 	private PeriodoService periodoService;
+	
+	@Inject
+	private PeriodoRespository periodoRepository;
 
 	@Inject
 	private ProfessorService professorService;
 	
 	@Inject
-	private GenericRepository<Historico> historicoRepository;
-
+	private HistoricoRepository historicoRepository;
+	
+	@Inject
+	private AfastamentoService afastamentoService;
+	
 	@Override
-	public void salvar(Reserva reserva) {
-		int vagas = professorService.findAtivos().size();
-		for (int ano = reserva.getAnoInicio(); ano <= reserva.getAnoTermino(); ano++) {
-			Periodo periodo = new Periodo();
-			periodo.setVagas((int) (vagas * 0.15));
-			periodo.setAno(ano);
-			periodo.setStatus(StatusPeriodo.ABERTO);
-			if (ano == reserva.getAnoInicio() && reserva.getSemestreInicio() == 2) {
-				periodo.setSemestre(2);
-				if (periodoService.getPeriodo(periodo.getAno(), periodo.getSemestre()) == null) {
-					periodoService.save(periodo);
-				}
-				continue;
-			}
-			if (ano == reserva.getAnoTermino() && reserva.getSemestreTermino() == 1) {
-				periodo.setSemestre(1);
-				if (periodoService.getPeriodo(periodo.getAno(), periodo.getSemestre()) == null) {
-					periodoService.save(periodo);
-				}
-				break;
-			}
-			periodo.setSemestre(1);
-			if (periodoService.getPeriodo(periodo.getAno(), periodo.getSemestre()) == null) {
-				periodoService.save(periodo);
-			}
-
-			periodo = new Periodo();
-			periodo.setAno(ano);
-			periodo.setSemestre(2);
-			periodo.setVagas((int) (vagas * 0.15));
-			periodo.setStatus(StatusPeriodo.ABERTO);
-			if (periodoService.getPeriodo(periodo.getAno(), periodo.getSemestre()) == null) {
-				periodoService.save(periodo);
-			}
+	public void incluir(Reserva reserva, Professor professor) throws SiafException {
+		validaDadosReserva(reserva);
+		
+		// Verifica se o professor já possui reserva em espera
+		List<Reserva> reservas = this.getReservasByStatusReservaAndProfessor(StatusReserva.EM_ESPERA, professor);
+		if (reservas != null && !reservas.isEmpty()) {
+			throw new SiafException(Constants.MSG_RESERVA_EM_ESPERA);
 		}
+		
+		// Salva a reserva
+		reserva.setProfessor(professor);
+		reserva.setStatus(StatusReserva.EM_ESPERA);
+		reserva.setDataSolicitacao(new Date());
+		reservaRepository.save(reserva);
+		this.criarPeriodos(reserva);
+	}
+	
+	@Override
+	public void atualizar(Reserva reserva, Professor professor) throws SiafException {
+		validaDadosReserva(reserva);
+		
+		if (!reserva.getStatus().equals(StatusReserva.EM_ESPERA)) {
+			throw new SiafException(Constants.MSG_PERMISSAO_NEGADA);
+		}
+		
 		reservaRepository.save(reserva);
 	}
-
+	
+	@Override
+	public void excluir(Reserva reserva) throws SiafException {
+		if(!reserva.getStatus().equals(StatusReserva.EM_ESPERA)) {
+			throw new SiafException(Constants.MSG_PERMISSAO_NEGADA);
+		}
+		reservaRepository.delete(reserva);
+	}
+	
+	@Override
+	public void cancelar(Reserva reserva) throws SiafException {
+		if(!reserva.getStatus().equals(StatusReserva.ABERTO)) {
+			throw new SiafException(Constants.MSG_PERMISSAO_NEGADA);
+		}
+		reserva.setStatus(StatusReserva.CANCELADO);
+		reservaRepository.save(reserva);
+	}
+	
+	@Override
+	public void homologar(Reserva reserva, StatusReserva status) {
+		if(reserva.getStatus().equals(StatusReserva.AFASTADO) && !status.equals(StatusReserva.AFASTADO)) {
+			afastamentoService.excluir(afastamentoService.getByReserva(reserva));
+		}
+		if (status.equals(StatusReserva.AFASTADO) && !reserva.getStatus().equals(StatusReserva.AFASTADO)) {
+			Afastamento afastamento = new Afastamento(reserva);
+			afastamentoService.salvar(afastamento);
+		}
+		
+		reserva.setStatus(status);
+		reservaRepository.save(reserva);
+	}
+	
 	@Override
 	public List<Reserva> getReservasByProfessor(Professor professor) {
-		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("cpf", professor.getUsuario().getCpf());
-		return reservaRepository.find(QueryType.JPQL,
-				"from Reserva where professor.usuario.cpf = :cpf order by dataSolicitacao DESC", params);
-	}
-
-	@Override
-	public boolean hasReservaEmAberto(Professor professor) {
-		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("cpf", professor.getUsuario().getCpf());
-		return reservaRepository.find(QueryType.JPQL, "from Reserva where status = 'ABERTO' and professor.usuario.cpf = :cpf",
-				params).size() > 0;
+		return reservaRepository.findByProfessor(professor);
 	}
 
 	@Override
 	public Reserva getReservaById(Long id) {
-		return reservaRepository.find(Reserva.class, id);
+		return reservaRepository.findOne(id);
 	}
 
 	@Override
 	public List<Reserva> getReservasAnterioresComPunicao(Professor professor, Periodo periodo) {
-		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("cpf", professor.getUsuario().getCpf());
-		params.put("ano", periodo.getAno());
-		params.put("semestre", periodo.getSemestre());
-		params.put("status", StatusReserva.CANCELADO_COM_PUNICAO);
-		return reservaRepository.find(QueryType.JPQL, "from Reserva where status = :status and professor.usuario.cpf = :cpf and (anoTermino < :ano or (anoTermino = :ano and semestreTermino < :semestre))", params);
-	}
-
-	@Override
-	public void atualizar(Reserva reserva) {
-		reservaRepository.update(reserva);
+		return reservaRepository.findAnterioresComPunicao(StatusReserva.CANCELADO_COM_PUNICAO, professor.getUsuario().getCpf(), periodo.getAno(), periodo.getSemestre());
 	}
 
 	@Override
 	public List<Reserva> getReservasByStatus(StatusReserva status) {
-		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("status", status);
-		return reservaRepository.find(QueryType.JPQL,
-				"from Reserva where status = :status order by anoInicio DESC, semestreInicio DESC", params);
+		return reservaRepository.findByStatus(status);
 	}
 
 	@Override
 	public List<Reserva> getReservasByStatusReservaAndPeriodo(StatusReserva statusReserva, Periodo periodo) {
-		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("status", statusReserva);
-		params.put("ano", periodo.getAno());
-		params.put("semestre", periodo.getSemestre());
-		return reservaRepository.find(QueryType.JPQL, "from Reserva where status = :status and anoInicio = :ano and semestreInicio = :semestre order by anoInicio, semestreInicio", params);
+		return reservaRepository.findByStatusAndAnoInicioAndSemestreInicio(statusReserva, periodo.getAno(), periodo.getSemestre());
 	}
 
 	@Override
 	public List<Reserva> getAllReservas() {
-		return reservaRepository.find(Reserva.class);
+		return reservaRepository.findAll();
 	}
 
 	@Override
-	public List<Reserva> getReservasByStatusReservaAndProfessor(
-			StatusReserva statusReserva, Professor professor) {
-		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("status", statusReserva);
-		params.put("id", professor.getId());
-		return reservaRepository.find(QueryType.JPQL,
-				"from Reserva where professor.id = :id and status = :status", params);
+	public List<Reserva> getReservasByStatusReservaAndProfessor(StatusReserva statusReserva, Professor professor) {
+		return reservaRepository.findByStatusAndProfessor(statusReserva, professor);
 	}
 
+	@Override
+	public void salvarHistorico(Reserva reserva, Acao acao, AutorAcao autor) {
+		this.salvarHistorico(reserva, acao, autor, null);
+	}
+	
 	@Override
 	public void salvarHistorico(Reserva reserva, Acao acao, AutorAcao autor, String comentario) {
 		Historico historico = new Historico();
@@ -155,16 +157,94 @@ public class ReservaServiceImpl extends GenericServiceImpl<Reserva> implements R
 		historico.setReserva(reserva);
 		
 		historicoRepository.save(historico);
-		
 	}
 
 	@Override
 	public Historico getUltimaAcao(Reserva reserva, Acao acao) {
-		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("id", reserva.getId());
-		params.put("acao", acao);
-		return historicoRepository.findFirst(QueryType.JPQL,
-				"from Historico where reserva.id = :id and acao = :acao order by data desc", params, 0);
+		return historicoRepository.findFirstByReservaAndAcaoOrderByDataDesc(reserva, acao);
+	}
+
+	private Integer calculaSemestres(Integer anoInicio, Integer semestreInicio, Integer anoTermino, Integer semestreTermino) {
+		return ((anoTermino - anoInicio) * 2) + (semestreTermino - semestreInicio);
+	}
+	
+	private void criarPeriodos(Reserva reserva) {
+		// Verifica se já existe período para todo o tempo da reserva
+		if (periodoService.getPeriodo(reserva.getAnoTermino(), reserva.getSemestreTermino()) != null) {
+			return;
+		}
+		
+		int vagas = professorService.countAtivos();
+		
+		// Criar os períodos inexistentes
+		for (int ano = reserva.getAnoTermino(); ano >= reserva.getAnoInicio(); ano--) {
+			Periodo periodo = new Periodo();
+			periodo.setVagas((int) (vagas * 0.15));
+			periodo.setAno(ano);
+			periodo.setStatus(StatusPeriodo.ABERTO);
+			
+			// Verifica se é o último período da reserva
+			if (ano == reserva.getAnoTermino()) {
+				if (reserva.getSemestreTermino() == 2) {
+					periodo.setSemestre(2);
+					periodoRepository.save(periodo);
+				}
+				periodo.setSemestre(1);
+				if (periodoService.getPeriodo(periodo.getAno(), periodo.getSemestre()) == null) {
+					periodoRepository.save(periodo);
+				} else {
+					break;
+				}
+				continue;
+			}
+			periodo.setSemestre(2);
+			if (periodoService.getPeriodo(periodo.getAno(), periodo.getSemestre()) == null) {
+				periodoRepository.save(periodo);
+			} else {
+				break;
+			}
+
+			periodo = new Periodo();
+			periodo.setAno(ano);
+			periodo.setSemestre(1);
+			periodo.setVagas((int) (vagas * 0.15));
+			periodo.setStatus(StatusPeriodo.ABERTO);
+			if (periodoService.getPeriodo(periodo.getAno(), periodo.getSemestre()) == null) {
+				periodoRepository.save(periodo);
+			} else {
+				break;
+			}
+		}
+	}
+	
+	private void validaDadosReserva(Reserva reserva) throws SiafException {
+		// Valida preenchimento dos dados
+		if (reserva.getAnoInicio() == null || reserva.getAnoTermino() == null) {
+			throw new SiafException(Constants.MSG_CAMPOS_OBRIGATORIOS);
+		}
+		
+		// Valida início e término
+		if (reserva.getAnoTermino() < reserva.getAnoInicio() || (reserva.getAnoInicio().equals(reserva.getAnoTermino()) 
+				&& reserva.getSemestreTermino() < reserva.getSemestreInicio())) {
+			throw new SiafException(Constants.MSG_PERIODO_INVALIDO);
+		}
+		
+		// Verifica se a solicitação está sendo feita com pelo menos 2 semestres de antecedência
+		Periodo periodo = periodoService.getPeriodoAtual();
+		Integer diferenca = calculaSemestres(periodo.getAno(), periodo.getSemestre(), reserva.getAnoInicio(), reserva.getSemestreInicio());
+		if (diferenca < 2) {
+			throw new SiafException(Constants.MSG_SOLICITACAO_FORA_DO_PRAZO);
+		}
+		
+		// Verifica se a quantidade de semestres solicitados está de acordo com o programa
+		if ((reserva.getPrograma() == Programa.MESTRADO || reserva.getPrograma() == Programa.POS_DOUTORADO)
+				&& calculaSemestres(reserva.getAnoInicio(), reserva.getSemestreInicio(), reserva.getAnoTermino(), reserva.getSemestreTermino()) + 1 > 4) {
+			throw new SiafException(Constants.MSG_TEMPO_MAXIMO_MESTRADO_POS_DOUTORADO);
+		}
+		if (reserva.getPrograma() == Programa.DOUTORADO && calculaSemestres(reserva.getAnoInicio(), 
+				reserva.getSemestreInicio(), reserva.getAnoTermino(), reserva.getSemestreTermino()) + 1 > 8) {
+			throw new SiafException(Constants.MSG_TEMPO_MAXIMO_DOUTORADO);
+		}
 	}
 
 }

@@ -101,7 +101,7 @@ public class ReservaController {
 	
 	@RequestMapping(value = {"/detalhes/{id}"}, method = RequestMethod.GET)
 	public String detalhes(@PathVariable("id") Long id, RedirectAttributes redirect, Model model) {
-		Reserva reserva = reservaService.find(Reserva.class, id);
+		Reserva reserva = reservaService.getReservaById(id);
 		if (reserva == null) {
 			redirect.addFlashAttribute(Constants.ERRO, Constants.MSG_PERMISSAO_NEGADA);
 			return Constants.REDIRECT_PAGINA_LISTAR_RESERVAS;
@@ -114,8 +114,7 @@ public class ReservaController {
 	
 	@RequestMapping(value = "/listar", method = RequestMethod.GET)
 	public String getReservas(Model model) {
-		List<Reserva> reservas = reservaService.getAllReservas();
-		model.addAttribute("reservas", reservas);
+		model.addAttribute("reservas", reservaService.getAllReservas());
 		return Constants.PAGINA_LISTAR_RESERVAS;
 	}
 

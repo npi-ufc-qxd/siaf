@@ -3,12 +3,21 @@ package ufc.quixada.npi.afastamento.service;
 import java.util.List;
 
 import ufc.quixada.npi.afastamento.model.Professor;
-import br.ufc.quixada.npi.service.GenericService;
 
-public interface ProfessorService extends GenericService<Professor>{
+public interface ProfessorService {
 	
 	List<Professor> findAtivos();
 	
-	Professor getByCpf(String cpf);
+	List<Professor> findAll();
+	
+	Integer countAtivos();
+	
+	Professor findByCpf(String cpf);
+	
+	Professor findById(Long id);
+	
+	void salvar(Professor professor);
+	
+	void atualizar(Professor professor);
 
 }

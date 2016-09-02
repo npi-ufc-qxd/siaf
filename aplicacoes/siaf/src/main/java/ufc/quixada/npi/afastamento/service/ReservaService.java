@@ -9,17 +9,21 @@ import ufc.quixada.npi.afastamento.model.Periodo;
 import ufc.quixada.npi.afastamento.model.Professor;
 import ufc.quixada.npi.afastamento.model.Reserva;
 import ufc.quixada.npi.afastamento.model.StatusReserva;
-import br.ufc.quixada.npi.service.GenericService;
+import ufc.quixada.npi.afastamento.util.SiafException;
 
-public interface ReservaService extends GenericService<Reserva> {
+public interface ReservaService {
 
-	void salvar(Reserva reserva);
+	void incluir(Reserva reserva, Professor professor) throws SiafException;
 	
-	void atualizar(Reserva reserva);
+	void atualizar(Reserva reserva, Professor professor) throws SiafException;
+	
+	void excluir(Reserva reserva) throws SiafException;
+	
+	void cancelar(Reserva reserva) throws SiafException;
+	
+	void homologar(Reserva reserva, StatusReserva status);
 	
 	List<Reserva> getReservasByProfessor(Professor professor);
-	
-	boolean hasReservaEmAberto(Professor professor);
 	
 	Reserva getReservaById(Long id);
 	
@@ -34,6 +38,8 @@ public interface ReservaService extends GenericService<Reserva> {
 	List<Reserva> getReservasByStatusReservaAndProfessor(StatusReserva statusReserva, Professor professor);
 	
 	void salvarHistorico(Reserva reserva, Acao acao, AutorAcao autor, String comentario);
+	
+	void salvarHistorico(Reserva reserva, Acao acao, AutorAcao autor);
 
 	Historico getUltimaAcao(Reserva reserva, Acao acao);
 }

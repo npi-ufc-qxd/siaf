@@ -13,6 +13,8 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
 
+import br.ufc.quixada.npi.model.Email;
+import br.ufc.quixada.npi.service.EmailService;
 import ufc.quixada.npi.afastamento.model.Acao;
 import ufc.quixada.npi.afastamento.model.AutorAcao;
 import ufc.quixada.npi.afastamento.model.Historico;
@@ -21,8 +23,6 @@ import ufc.quixada.npi.afastamento.model.Reserva;
 import ufc.quixada.npi.afastamento.model.StatusReserva;
 import ufc.quixada.npi.afastamento.service.NotificacaoService;
 import ufc.quixada.npi.afastamento.service.ReservaService;
-import br.ufc.quixada.npi.model.Email;
-import br.ufc.quixada.npi.service.EmailService;
 
 @Named
 public class NotificacaoServiceImpl implements NotificacaoService {

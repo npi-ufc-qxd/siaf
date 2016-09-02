@@ -80,7 +80,7 @@ public class Constants {
 	
 	public static final String MSG_SOLICITACAO_FORA_DO_PRAZO = "Sua solicitação está fora do prazo permitido.";
 	
-	public static final String MSG_TEMPO_MAXIMO_MESTRADO = "O tempo máximo para mestrado ou pós-doutorado é de 4 semestres.";
+	public static final String MSG_TEMPO_MAXIMO_MESTRADO_POS_DOUTORADO = "O tempo máximo para mestrado ou pós-doutorado é de 4 semestres.";
 	
 	public static final String MSG_TEMPO_MAXIMO_DOUTORADO = "O tempo máximo para doutorado é de 8 semestres.";
 	

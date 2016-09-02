@@ -1,16 +1,13 @@
 package ufc.quixada.npi.afastamento.service;
 
-import java.sql.Date;
 import java.util.List;
 
 import ufc.quixada.npi.afastamento.model.Periodo;
-import br.ufc.quixada.npi.service.GenericService;
+import ufc.quixada.npi.afastamento.util.SiafException;
 
-public interface PeriodoService extends GenericService<Periodo> {
+public interface PeriodoService {
 	
 	Periodo getPeriodo(Integer ano, Integer semestre);
-	
-	Periodo getPeriodoByEncerramento(Date encerramento);
 	
 	Periodo getPeriodoAtual();
 	
@@ -18,17 +15,15 @@ public interface PeriodoService extends GenericService<Periodo> {
 	
 	Periodo getPeriodoPosterior(Periodo periodo);
 	
-	Integer getSemestreAtual();
+	Periodo findById(Long id);
 	
-	Integer getAnoAtual();
-
-	Periodo getUltimoPeriodoEncerrado();
-	
-	List<Periodo> getAll();
+	void atualizar(Periodo periodo) throws SiafException;
 	
 	List<Periodo> getPeriodosPosteriores(Periodo periodo);
 	
 	List<Periodo> getPeriodoAbertos();
+	
+	List<Periodo> getAll();
 	
 	void encerrarPeriodo(Periodo periodo);
 }

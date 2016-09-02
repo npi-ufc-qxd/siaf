@@ -1,8 +1,6 @@
 package ufc.quixada.npi.afastamento.controller;
 
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -12,8 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import ufc.quixada.npi.afastamento.model.Periodo;
-import ufc.quixada.npi.afastamento.model.RelatorioPeriodo;
-import ufc.quixada.npi.afastamento.model.TuplaRanking;
 import ufc.quixada.npi.afastamento.service.PeriodoService;
 import ufc.quixada.npi.afastamento.service.RankingService;
 
@@ -31,8 +27,7 @@ public class RelatorioController {
 	public String getRelatorio(Model model) {
 		Periodo periodo = periodoService.getPeriodoAtual();
 		if (periodo != null) {
-			Map<TuplaRanking, List<RelatorioPeriodo>> relatorio = rankingService.getRelatorio(periodo);
-			model.addAttribute("relatorio", relatorio);
+			model.addAttribute("relatorio", rankingService.getRelatorio(periodo));
 			model.addAttribute("periodos", periodoService.getPeriodoAbertos());
 			Periodo periodoAtual = periodoService.getPeriodoAtual();
 			model.addAttribute("periodoAtual", periodoAtual);

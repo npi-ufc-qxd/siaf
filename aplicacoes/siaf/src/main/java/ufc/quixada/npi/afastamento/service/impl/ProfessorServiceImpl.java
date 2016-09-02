@@ -1,34 +1,53 @@
 package ufc.quixada.npi.afastamento.service.impl;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import br.ufc.quixada.npi.enumeration.QueryType;
-import br.ufc.quixada.npi.repository.GenericRepository;
-import br.ufc.quixada.npi.service.impl.GenericServiceImpl;
 import ufc.quixada.npi.afastamento.model.Professor;
+import ufc.quixada.npi.afastamento.repository.ProfessorRepository;
 import ufc.quixada.npi.afastamento.service.ProfessorService;
 
 @Named
-public class ProfessorServiceImpl extends GenericServiceImpl<Professor> implements ProfessorService {
+public class ProfessorServiceImpl implements ProfessorService {
 
 	@Inject
-	private GenericRepository<Professor> professorRepository;
+	private ProfessorRepository professorRepository;
 	
 	@Override
 	public List<Professor> findAtivos() {
-		return professorRepository.find(QueryType.JPQL, "select p from Professor p where usuario.habilitado = true", null);
+		return professorRepository.findByUsuarioHabilitado();
 	}
 
 	@Override
-	public Professor getByCpf(String cpf) {
-		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("cpf", cpf);
-		return professorRepository.findFirst(QueryType.JPQL, "select p from Professor p where cpf = :cpf", params, -1);
+	public Professor findByCpf(String cpf) {
+		return professorRepository.findByUsuarioCpf(cpf);
+	}
+
+	@Override
+	public void salvar(Professor professor) {
+		professorRepository.save(professor);
+	}
+
+	@Override
+	public Professor findById(Long id) {
+		return professorRepository.findOne(id);
+	}
+
+	@Override
+	public void atualizar(Professor professor) {
+		professorRepository.save(professor);
+	}
+
+	@Override
+	public Integer countAtivos() {
+		return professorRepository.countByUsuarioHabilitado();
+	}
+
+	@Override
+	public List<Professor> findAll() {
+		return professorRepository.findAll();
 	}
 
 }

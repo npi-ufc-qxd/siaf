@@ -13,6 +13,7 @@ import javax.inject.Named;
 import ufc.quixada.npi.afastamento.model.Afastamento;
 import ufc.quixada.npi.afastamento.model.Periodo;
 import ufc.quixada.npi.afastamento.model.Programa;
+import ufc.quixada.npi.afastamento.model.Ranking;
 import ufc.quixada.npi.afastamento.model.RelatorioPeriodo;
 import ufc.quixada.npi.afastamento.model.Reserva;
 import ufc.quixada.npi.afastamento.model.StatusReserva;
@@ -34,6 +35,9 @@ public class RankingServiceImpl implements RankingService {
 
 	@Inject
 	private PeriodoService periodoService;
+	
+	@Inject
+	private RankingService rankingService;
 	
 	
 	@Override
@@ -342,6 +346,26 @@ public class RankingServiceImpl implements RankingService {
 
 	private Integer calculaSemestres(Integer anoInicio, Integer semestreInicio, Integer anoTermino, Integer semestreTermino) {
 		return ((anoTermino - anoInicio) * 2) + (semestreTermino - semestreInicio) + 1;
+	}
+
+	@Override
+	public Ranking getRankingHomologacao(Periodo periodo) {
+		Ranking ranking = new Ranking();
+		ranking.setPeriodo(periodo);
+		List<TuplaRanking> tuplas = new ArrayList<TuplaRanking>();
+		for(TuplaRanking tupla : rankingService.getRanking(periodo, false)) {
+			if (tupla.getReserva().getStatus().equals(StatusReserva.ABERTO)) {
+				if(tupla.getReserva().getAnoInicio().equals(periodo.getAno())
+					&& tupla.getReserva().getSemestreInicio().equals(periodo.getSemestre())) {
+					tuplas.add(tupla);
+				}
+			} else {
+				tuplas.add(tupla);
+			}
+		}
+		ranking.setTuplas(tuplas);
+		
+		return ranking;
 	}
 
 }
