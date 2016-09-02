@@ -86,7 +86,7 @@
 									<td>${reserva.programa.descricao }</td>
 									<td>${reserva.conceitoPrograma eq 0 ? "-" : reserva.conceitoPrograma}</td>
 									<td>${reserva.instituicao }</td>
-									<td><fmt:formatDate value="${reserva.dataSolicitacao}" pattern="dd/MM/yyyy hh:mm"/></td>
+									<td><fmt:formatDate value="${reserva.dataSolicitacao}" pattern="dd/MM/yyyy HH:mm"/></td>
 									<td>${reserva.status.descricao }</td>
 									<td>
 										<a class="btn btn-primary btn-sm" title="Detalhes" href="<c:url value="/reserva/detalhes/${reserva.id }"/>">
