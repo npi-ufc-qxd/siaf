@@ -37,10 +37,7 @@ public class Constants {
 	
 	public static final String PAGINA_ADMIN_EDITAR_RESERVA = "admin/editarReserva";
 	
-	public static final String PAGINA_DETALHE_RESERVA = "reserva/detalhes";
-	
-	public static final String PAGINA_EDITAR_ADMISSAO = "admin/editarAdmissao";
-	
+	public static final String PAGINA_DETALHE_RESERVA = "reserva/detalhes";	
 	
 	
 	/** Redirecionamentos */

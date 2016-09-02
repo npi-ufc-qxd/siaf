@@ -133,6 +133,8 @@ public class AdministracaoController {
 			if (encerramento != null && !encerramento.isEmpty()) {
 				SimpleDateFormat format = new SimpleDateFormat(br.ufc.quixada.npi.ldap.model.Constants.FORMATO_DATA_NASCIMENTO);
 				periodo.setEncerramento(format.parse(encerramento));
+			} else {
+				periodo.setEncerramento(null);
 			}
 			if (vagas != null) {
 				periodo.setVagas(vagas);
@@ -164,11 +166,11 @@ public class AdministracaoController {
 
 	@RequestMapping(value = "/editar-admissao", method = RequestMethod.POST)
 	public String editarAdmissao(@RequestParam("id") Long id, @RequestParam("ano") Integer ano,
-			@RequestParam("semestre") Integer semestre, Model model) {
+			@RequestParam("semestre") Integer semestre, RedirectAttributes redirect) {
 
 		if (id == null || ano == null || semestre == null) {
-			model.addAttribute(Constants.ERRO, Constants.MSG_CAMPOS_OBRIGATORIOS);
-			return Constants.PAGINA_EDITAR_ADMISSAO;
+			redirect.addFlashAttribute(Constants.ERRO, Constants.MSG_CAMPOS_OBRIGATORIOS);
+			return Constants.REDIRECT_PAGINA_LISTAR_PROFESSORES;
 		}
 
 		Professor professor = professorService.findById(id);
@@ -177,14 +179,12 @@ public class AdministracaoController {
 
 		professorService.atualizar(professor);
 
-		model.addAttribute("professores", professorService.findAll());
-		model.addAttribute("info", "Data de admissão do(a) Prof(a) " + professor.getUsuario().getNome() + " atualizada com sucesso.");
-
 		Reserva reserva = new Reserva();
 		reserva.setProfessor(professor);
 		notificacaoService.notificar(reserva, Notificacao.ADMISSAO_ALTERADA, professor.getUsuario().getNome());
 		
-		return Constants.PAGINA_LISTAR_PROFESSORES;
+		redirect.addFlashAttribute(Constants.INFO, "Data de admissão do(a) Prof(a) " + professor.getUsuario().getNome() + " atualizada com sucesso.");
+		return Constants.REDIRECT_PAGINA_LISTAR_PROFESSORES;
 	}
 	
 	@RequestMapping(value = "/editar-reserva/{id}", method = RequestMethod.GET)

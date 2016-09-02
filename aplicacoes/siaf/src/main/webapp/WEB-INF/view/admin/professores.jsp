@@ -34,9 +34,9 @@
 				</c:if>
 			</div>
 
-			<div>
+			<%-- <div>
 				<a id="atualizarLista" href="<c:url value="/administracao/atualizar-professores" />" class="btn btn-siaf">Atualizar Lista</a>	
-			</div>
+			</div> --%>
 			<br>
 			<div class="container">
 				<table id="tableProfessores" class="table table-striped">

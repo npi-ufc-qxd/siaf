@@ -84,7 +84,7 @@ public class DocenteController {
 	public String editar(@ModelAttribute("reserva") Reserva reserva, Model model, RedirectAttributes redirect, Authentication auth) {
 		Reserva reservaAtual = reservaService.getReservaById(reserva.getId());
 		Professor professor = professorService.findByCpf(auth.getName());
-		if (reserva == null || !reserva.getProfessor().equals(professor)) {
+		if (reservaAtual == null || !reservaAtual.getProfessor().equals(professor)) {
 			redirect.addFlashAttribute(Constants.ERRO, Constants.MSG_PERMISSAO_NEGADA);
 			return Constants.REDIRECT_PAGINA_MINHAS_RESERVAS;
 		}

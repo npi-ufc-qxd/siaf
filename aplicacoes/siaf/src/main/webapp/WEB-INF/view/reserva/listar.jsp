@@ -104,7 +104,7 @@
 												data-target="#admin-excluir-reserva" href="#"
 												data-href="<c:url value="/administracao/excluir-reserva/${reserva.id}"></c:url>"
 												data-name="${reserva.anoInicio}.${reserva.semestreInicio} a ${reserva.anoTermino}.${reserva.semestreTermino}"
-												data-professor="${reserva.professor.nome}">
+												data-professor="${reserva.professor.usuario.nome}">
 												<button class="btn btn-warning btn-sm">
 													<i class="fa fa-trash-o"></i>
 												</button>

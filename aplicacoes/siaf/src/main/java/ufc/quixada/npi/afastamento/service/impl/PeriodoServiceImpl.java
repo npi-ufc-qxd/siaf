@@ -137,7 +137,7 @@ public class PeriodoServiceImpl implements PeriodoService {
 
 	@Override
 	public void atualizar(Periodo periodo) throws SiafException {
-		if (periodo.getEncerramento().before(new Date())) {
+		if (periodo.getEncerramento() != null && new Date().after(periodo.getEncerramento())) {
 			throw new SiafException(Constants.MSG_DATA_FUTURA);
 		}
 		periodoRepository.save(periodo);
