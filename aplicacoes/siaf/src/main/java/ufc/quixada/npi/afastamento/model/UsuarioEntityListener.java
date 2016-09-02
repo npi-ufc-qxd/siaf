@@ -15,7 +15,6 @@ public class UsuarioEntityListener implements ApplicationContextAware {
 	public void loadProfessor(Usuario usuario) {
 		UsuarioService usuarioService = (UsuarioService) context.getBean(UsuarioService.class);
 		br.ufc.quixada.npi.ldap.model.Usuario usuarioLdap = usuarioService.getByCpf(usuario.getCpf());
-		System.out.println(usuarioLdap.getCpf());
 		usuario.setNome(usuarioLdap.getNome().toUpperCase());
 		usuario.setEmail(usuarioLdap.getEmail());
 		usuario.setNascimento(usuarioLdap.getNascimento());

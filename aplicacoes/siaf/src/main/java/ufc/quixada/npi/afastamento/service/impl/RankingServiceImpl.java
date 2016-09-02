@@ -167,7 +167,6 @@ public class RankingServiceImpl implements RankingService {
 			rankings.put(p, new ArrayList<TuplaRanking>());
 		}
 
-		List<TuplaRanking> tuplas = new ArrayList<TuplaRanking>();
 		List<Reserva> reservas = new ArrayList<Reserva>();
 		List<Reserva> reservasEmAberto = reservaService.getReservasByStatus(StatusReserva.ABERTO);
 		reservas.addAll(reservasEmAberto);
@@ -184,6 +183,7 @@ public class RankingServiceImpl implements RankingService {
 			}
 		}
 
+		List<TuplaRanking> tuplas = new ArrayList<TuplaRanking>();
 		tuplas.addAll(calculaPontuacao(reservas, periodo));
 
 		Collections.sort(tuplas, new Comparator<TuplaRanking>() {
@@ -192,9 +192,6 @@ public class RankingServiceImpl implements RankingService {
 				if (tupla1.getPontuacao().compareTo(tupla2.getPontuacao()) == 0.0f) {
 					if (tupla1.getReserva().getPrograma().equals(tupla2.getReserva().getPrograma())) {
 						if (tupla1.getReserva().getConceitoPrograma().equals(tupla2.getReserva().getConceitoPrograma())) {
-							System.out.println(tupla2.getReserva().getProfessor().getId());
-							System.out.println(tupla2.getReserva().getProfessor().getUsuario().getId());
-							System.out.println(tupla2.getReserva().getProfessor().getUsuario().getNascimento());
 							return tupla1.getReserva().getProfessor().getUsuario().getNascimento()
 									.compareTo(tupla2.getReserva().getProfessor().getUsuario().getNascimento());
 						}
