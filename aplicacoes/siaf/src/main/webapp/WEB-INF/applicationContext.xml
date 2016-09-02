@@ -24,15 +24,15 @@
 	
 	<bean id="applicationContextProvider" class="ufc.quixada.npi.afastamento.model.UsuarioEntityListener"/>
 	
-	<bean id="emf" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+	<bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
 		<property name="persistenceUnitName" value="dev" />
 		<property name="dataSource" ref="siaf" />
 	</bean>
 	<bean id="siaf" class="org.springframework.jndi.JndiObjectFactoryBean">
 		<property name="jndiName" value="java:comp/env/siaf" />
 	</bean>
-	<bean id="txManager" class="org.springframework.orm.jpa.JpaTransactionManager">
-		<property name="entityManagerFactory" ref="emf" />
+	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory" ref="entityManagerFactory" />
 	</bean>
 
 	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
@@ -67,7 +67,7 @@
         <constructor-arg ref="ldapOu" />
     </bean>
     
-    <tx:annotation-driven transaction-manager="txManager" proxy-target-class="true" />
+    <tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true" />
 
 	<context:annotation-config />
 	<context:component-scan base-package="ufc.quixada.npi.afastamento.*" />

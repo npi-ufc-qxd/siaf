@@ -10,10 +10,10 @@ import ufc.quixada.npi.afastamento.model.Professor;
 @Repository
 public interface ProfessorRepository extends JpaRepository<Professor, Long> {
 	
-	List<Professor> findByUsuarioHabilitado();
+	List<Professor> findByUsuarioHabilitadoTrue();
 	
 	Professor findByUsuarioCpf(String cpf);
 	
-	Integer countByUsuarioHabilitado();
+	Integer countByUsuarioHabilitadoTrue();
 
 }

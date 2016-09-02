@@ -17,7 +17,7 @@ public class ProfessorServiceImpl implements ProfessorService {
 	
 	@Override
 	public List<Professor> findAtivos() {
-		return professorRepository.findByUsuarioHabilitado();
+		return professorRepository.findByUsuarioHabilitadoTrue();
 	}
 
 	@Override
@@ -42,7 +42,7 @@ public class ProfessorServiceImpl implements ProfessorService {
 
 	@Override
 	public Integer countAtivos() {
-		return professorRepository.countByUsuarioHabilitado();
+		return professorRepository.countByUsuarioHabilitadoTrue();
 	}
 
 	@Override
