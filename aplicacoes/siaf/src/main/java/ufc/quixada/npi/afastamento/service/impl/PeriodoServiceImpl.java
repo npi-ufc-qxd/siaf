@@ -7,7 +7,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import ufc.quixada.npi.afastamento.model.Acao;
-import ufc.quixada.npi.afastamento.model.AutorAcao;
 import ufc.quixada.npi.afastamento.model.Notificacao;
 import ufc.quixada.npi.afastamento.model.Periodo;
 import ufc.quixada.npi.afastamento.model.Reserva;
@@ -88,7 +87,7 @@ public class PeriodoServiceImpl implements PeriodoService {
 				Reserva reserva = tupla.getReserva();
 				reserva.setStatus(StatusReserva.ENCERRADO);
 				reservaRepository.save(reserva);
-				reservaService.salvarHistorico(reserva, Acao.ENCERRAMENTO, AutorAcao.SISTEMA, null);
+				reservaService.salvarHistorico(reserva, Acao.ENCERRAMENTO, Constants.SISTEMA, null);
 			}
 		}
 		periodo.setStatus(StatusPeriodo.ENCERRADO);
@@ -99,7 +98,7 @@ public class PeriodoServiceImpl implements PeriodoService {
 				Reserva reserva = tupla.getReserva();
 				reserva.setStatus(StatusReserva.NAO_ACEITO);
 				reservaRepository.save(reserva);
-				reservaService.salvarHistorico(reserva, Acao.NAO_ACEITACAO, AutorAcao.SISTEMA, null);
+				reservaService.salvarHistorico(reserva, Acao.NAO_ACEITACAO, Constants.SISTEMA, null);
 			}
 		}
 		List<Reserva> reservasEmEspera = reservaService.getReservasByStatus(StatusReserva.EM_ESPERA);
@@ -110,8 +109,8 @@ public class PeriodoServiceImpl implements PeriodoService {
 				if (reservaEspera.getProfessor().equals(reservaAberto.getProfessor())) {
 					reservaAberto.setStatus(StatusReserva.CANCELADO);
 					reservaRepository.save(reservaAberto);
-					reservaService.salvarHistorico(reservaAberto, Acao.CANCELAMENTO, AutorAcao.SISTEMA, Constants.MSG_CANCELAMENTO_AUTOMATICO);
-					notificacaoService.notificar(reservaAberto, Notificacao.RESERVA_CANCELADA, AutorAcao.SISTEMA);
+					reservaService.salvarHistorico(reservaAberto, Acao.CANCELAMENTO, Constants.SISTEMA, Constants.MSG_CANCELAMENTO_AUTOMATICO);
+					notificacaoService.notificar(reservaAberto, Notificacao.RESERVA_CANCELADA, Constants.SISTEMA);
 					break;
 				}
 			}
@@ -120,8 +119,8 @@ public class PeriodoServiceImpl implements PeriodoService {
 		for(Reserva reserva : reservasEmEspera) {
 			reserva.setStatus(StatusReserva.ABERTO);
 			reservaRepository.save(reserva);
-			reservaService.salvarHistorico(reserva, Acao.INCLUSAO_RANKING, AutorAcao.SISTEMA, null);
-			notificacaoService.notificar(reserva, Notificacao.RESERVA_INCLUIDA_RANKING, AutorAcao.SISTEMA);
+			reservaService.salvarHistorico(reserva, Acao.INCLUSAO_RANKING, Constants.SISTEMA, null);
+			notificacaoService.notificar(reserva, Notificacao.RESERVA_INCLUIDA_RANKING, Constants.SISTEMA);
 		}
 		
 	}

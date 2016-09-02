@@ -9,6 +9,13 @@ import javax.persistence.OneToOne;
 @Entity
 public class Afastamento {
 	
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+	
+	@OneToOne
+	private Reserva reserva;
+	
 	public Afastamento() {
 		super();
 	}
@@ -17,13 +24,6 @@ public class Afastamento {
 		super();
 		this.reserva = reserva;
 	}
-	
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
-	
-	@OneToOne
-	private Reserva reserva;
 	
 	public Long getId() {
 		return id;

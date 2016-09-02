@@ -26,8 +26,7 @@ public class Historico {
 	@Column(columnDefinition="TEXT")
 	private String comentario;
 	
-	@Enumerated(EnumType.STRING)
-	private AutorAcao autor;
+	private String autor;
 	
 	@ManyToOne
 	private Reserva reserva;
@@ -72,11 +71,11 @@ public class Historico {
 		this.comentario = comentario;
 	}
 
-	public AutorAcao getAutor() {
+	public String getAutor() {
 		return autor;
 	}
 
-	public void setAutor(AutorAcao autor) {
+	public void setAutor(String autor) {
 		this.autor = autor;
 	}
 	

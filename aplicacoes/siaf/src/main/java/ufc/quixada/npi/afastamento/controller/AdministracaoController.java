@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import ufc.quixada.npi.afastamento.model.Acao;
-import ufc.quixada.npi.afastamento.model.AutorAcao;
 import ufc.quixada.npi.afastamento.model.Notificacao;
 import ufc.quixada.npi.afastamento.model.Periodo;
 import ufc.quixada.npi.afastamento.model.Professor;
@@ -27,11 +26,13 @@ import ufc.quixada.npi.afastamento.model.Programa;
 import ufc.quixada.npi.afastamento.model.Reserva;
 import ufc.quixada.npi.afastamento.model.StatusReserva;
 import ufc.quixada.npi.afastamento.model.TuplaRanking;
+import ufc.quixada.npi.afastamento.model.Usuario;
 import ufc.quixada.npi.afastamento.service.NotificacaoService;
 import ufc.quixada.npi.afastamento.service.PeriodoService;
 import ufc.quixada.npi.afastamento.service.ProfessorService;
 import ufc.quixada.npi.afastamento.service.RankingService;
 import ufc.quixada.npi.afastamento.service.ReservaService;
+import ufc.quixada.npi.afastamento.service.UserService;
 import ufc.quixada.npi.afastamento.util.Constants;
 import ufc.quixada.npi.afastamento.util.SiafException;
 
@@ -53,6 +54,9 @@ public class AdministracaoController {
 
 	@Inject
 	private NotificacaoService notificacaoService;
+	
+	@Inject
+	private UserService usuarioService;
 
 	@RequestMapping(value = "/professores", method = RequestMethod.GET)
 	public String listarProfessores(Model model) {
@@ -98,17 +102,18 @@ public class AdministracaoController {
 	
 	@RequestMapping(value = "/homologar-reserva", method = RequestMethod.POST)
 	public String atualizarStatusReserva(@RequestParam("idReserva") Long id, @RequestParam("status") String status, 
-			@RequestParam(value = "motivo", required = false) String motivo, Model model, RedirectAttributes redirect) {
+			@RequestParam(value = "motivo", required = false) String motivo, Model model, RedirectAttributes redirect, Authentication auth) {
 	
 		Reserva reserva = reservaService.getReservaById(id);
 		StatusReserva statusReserva = StatusReserva.valueOf(status);
 		reservaService.homologar(reserva, statusReserva);
 		
+		Usuario usuario = usuarioService.getByCpf(auth.getName());
 		Acao acao = Acao.getByStatusReserva(statusReserva);
 		if (acao != null) {
-			reservaService.salvarHistorico(reserva, acao, AutorAcao.ADMINISTRADOR, motivo);
+			reservaService.salvarHistorico(reserva, acao, usuario.getNome(), motivo);
 		}
-		notificacaoService.notificar(reserva, Notificacao.RESERVA_HOMOLOGADA, AutorAcao.ADMINISTRADOR);
+		notificacaoService.notificar(reserva, Notificacao.RESERVA_HOMOLOGADA, usuario.getNome());
 		redirect.addFlashAttribute(Constants.INFO, Constants.MSG_RESERVA_HOMOLOGADA);
 		return Constants.REDIRECT_PAGINA_HOMOLOGAR_RESERVAS;
 	}
@@ -177,7 +182,7 @@ public class AdministracaoController {
 
 		Reserva reserva = new Reserva();
 		reserva.setProfessor(professor);
-		notificacaoService.notificar(reserva, Notificacao.ADMISSAO_ALTERADA, AutorAcao.ADMINISTRADOR);
+		notificacaoService.notificar(reserva, Notificacao.ADMISSAO_ALTERADA, professor.getUsuario().getNome());
 		
 		return Constants.PAGINA_LISTAR_PROFESSORES;
 	}
@@ -198,8 +203,7 @@ public class AdministracaoController {
 	public String editarReserva(@ModelAttribute("reserva") Reserva reserva, Model model, RedirectAttributes redirect, Authentication auth) {
 		
 		Reserva reservaAtual = reservaService.getReservaById(reserva.getId());
-		Professor professor = professorService.findByCpf(auth.getName());
-		if (reserva == null || !reserva.getProfessor().equals(professor)) {
+		if (reservaAtual == null) {
 			redirect.addFlashAttribute(Constants.ERRO, Constants.MSG_PERMISSAO_NEGADA);
 			return Constants.REDIRECT_PAGINA_MINHAS_RESERVAS;
 		}
@@ -212,24 +216,25 @@ public class AdministracaoController {
 		reservaAtual.setPrograma(reserva.getPrograma());
 		
 		try {
-			reservaService.atualizar(reservaAtual, professor);
+			reservaService.atualizar(reservaAtual);
 		} catch (SiafException exception) {
 			model.addAttribute("reserva", reservaAtual);
-			model.addAttribute("professor", professor);
+			model.addAttribute("professor", reservaAtual.getProfessor());
 			model.addAttribute("programa", Programa.values());
 			model.addAttribute(Constants.ERRO, exception.getMessage());
 			return Constants.PAGINA_EDITAR_RESERVA;
 		}
 
-		reservaService.salvarHistorico(reserva, Acao.EDICAO, AutorAcao.ADMINISTRADOR);
-		notificacaoService.notificar(reserva, Notificacao.RESERVA_ALTERADA, AutorAcao.ADMINISTRADOR);
+		Usuario usuario = usuarioService.getByCpf(auth.getName());
+		reservaService.salvarHistorico(reservaAtual, Acao.EDICAO, usuario.getNome());
+		notificacaoService.notificar(reservaAtual, Notificacao.RESERVA_ALTERADA, usuario.getNome());
 		redirect.addFlashAttribute(Constants.INFO, Constants.MSG_RESERVA_ATUALIZADA);
 		return Constants.REDIRECT_PAGINA_LISTAR_RESERVAS;
 		
 	}
 	
 	@RequestMapping(value = "/excluir-reserva/{id}", method = RequestMethod.GET)
-	public String excluir(@PathVariable("id") Long id, RedirectAttributes redirect) {
+	public String excluir(@PathVariable("id") Long id, RedirectAttributes redirect, Authentication auth) {
 		Reserva reserva = reservaService.getReservaById(id);
 		try {
 			reservaService.excluir(reserva);
@@ -237,7 +242,7 @@ public class AdministracaoController {
 			redirect.addFlashAttribute(Constants.ERRO, exception.getMessage());
 			return Constants.REDIRECT_PAGINA_MINHAS_RESERVAS;
 		}
-		notificacaoService.notificar(reserva, Notificacao.RESERVA_EXCLUIDA, AutorAcao.ADMINISTRADOR);
+		notificacaoService.notificar(reserva, Notificacao.RESERVA_EXCLUIDA, usuarioService.getByCpf(auth.getName()).getNome());
 		redirect.addFlashAttribute(Constants.INFO, Constants.MSG_RESERVA_EXCLUIDA);
 		return Constants.REDIRECT_PAGINA_LISTAR_RESERVAS;
 	}
@@ -254,7 +259,7 @@ public class AdministracaoController {
 	}
 	
 	@RequestMapping(value = "/cancelar-reserva", method = RequestMethod.POST)
-	public String cancelar(@RequestParam("id") Long id, @RequestParam("motivo") String motivo, HttpSession session, RedirectAttributes redirect) {
+	public String cancelar(@RequestParam("id") Long id, @RequestParam("motivo") String motivo, RedirectAttributes redirect, Authentication auth) {
 		Reserva reserva = reservaService.getReservaById(id);
 		try {
 			reservaService.cancelar(reserva);
@@ -262,8 +267,9 @@ public class AdministracaoController {
 			redirect.addFlashAttribute(Constants.ERRO, exception.getMessage());
 			return Constants.REDIRECT_PAGINA_MINHAS_RESERVAS;
 		}
-		reservaService.salvarHistorico(reserva, Acao.CANCELAMENTO, AutorAcao.ADMINISTRADOR, motivo);
-		notificacaoService.notificar(reserva, Notificacao.RESERVA_CANCELADA, AutorAcao.ADMINISTRADOR);
+		Usuario usuario = usuarioService.getByCpf(auth.getName());
+		reservaService.salvarHistorico(reserva, Acao.CANCELAMENTO, usuario.getNome(), motivo);
+		notificacaoService.notificar(reserva, Notificacao.RESERVA_CANCELADA, usuario.getNome());
 		redirect.addFlashAttribute(Constants.INFO, Constants.MSG_RESERVA_CANCELADA);
 		return Constants.REDIRECT_PAGINA_LISTAR_RESERVAS;
 	}

@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import ufc.quixada.npi.afastamento.model.Acao;
-import ufc.quixada.npi.afastamento.model.AutorAcao;
 import ufc.quixada.npi.afastamento.model.Notificacao;
 import ufc.quixada.npi.afastamento.model.Professor;
 import ufc.quixada.npi.afastamento.model.Programa;
@@ -52,18 +51,19 @@ public class DocenteController {
 
 	@RequestMapping(value = "/incluir", method = RequestMethod.POST)
 	public String incluir(@ModelAttribute("reserva") Reserva reserva, Model model, RedirectAttributes redirect, Authentication auth) {
+		Professor professor = professorService.findByCpf(auth.getName());
 		try {
-			reservaService.incluir(reserva, professorService.findByCpf(auth.getName()));
+			reservaService.incluir(reserva, professor);
 		} catch (SiafException exception) {
 			model.addAttribute("reserva", reserva);
-			model.addAttribute("professor", professorService.findByCpf(auth.getName()));
+			model.addAttribute("professor", professor);
 			model.addAttribute("programa", Programa.values());
 			model.addAttribute(Constants.ERRO, exception.getMessage());
 			return Constants.PAGINA_INCLUIR_RESERVA;
 		}
 
-		reservaService.salvarHistorico(reserva, Acao.CRIACAO, AutorAcao.PROFESSOR);
-		notificacaoService.notificar(reserva, Notificacao.RESERVA_INCLUIDA, AutorAcao.PROFESSOR);
+		reservaService.salvarHistorico(reserva, Acao.CRIACAO, professor.getUsuario().getNome());
+		notificacaoService.notificar(reserva, Notificacao.RESERVA_INCLUIDA, professor.getUsuario().getNome());
 		redirect.addFlashAttribute(Constants.INFO, Constants.MSG_RESERVA_INCLUIDA);
 		return Constants.REDIRECT_PAGINA_MINHAS_RESERVAS;
 	}
@@ -97,7 +97,7 @@ public class DocenteController {
 		reservaAtual.setPrograma(reserva.getPrograma());
 		
 		try {
-			reservaService.atualizar(reservaAtual, professor);
+			reservaService.atualizar(reservaAtual);
 		} catch (SiafException exception) {
 			model.addAttribute("reserva", reservaAtual);
 			model.addAttribute("professor", professor);
@@ -106,8 +106,8 @@ public class DocenteController {
 			return Constants.PAGINA_EDITAR_RESERVA;
 		}
 
-		reservaService.salvarHistorico(reservaAtual, Acao.EDICAO, AutorAcao.PROFESSOR);
-		notificacaoService.notificar(reservaAtual, Notificacao.RESERVA_ALTERADA, AutorAcao.PROFESSOR);
+		reservaService.salvarHistorico(reservaAtual, Acao.EDICAO, professor.getUsuario().getNome());
+		notificacaoService.notificar(reservaAtual, Notificacao.RESERVA_ALTERADA, professor.getUsuario().getNome());
 		redirect.addFlashAttribute(Constants.INFO, Constants.MSG_RESERVA_ATUALIZADA);
 		return Constants.REDIRECT_PAGINA_MINHAS_RESERVAS;
 	}
@@ -134,7 +134,7 @@ public class DocenteController {
 				redirect.addFlashAttribute(Constants.ERRO, exception.getMessage());
 				return Constants.REDIRECT_PAGINA_MINHAS_RESERVAS;
 			}
-			notificacaoService.notificar(reserva, Notificacao.RESERVA_EXCLUIDA, AutorAcao.PROFESSOR);
+			notificacaoService.notificar(reserva, Notificacao.RESERVA_EXCLUIDA, professor.getUsuario().getNome());
 			redirect.addFlashAttribute(Constants.INFO, Constants.MSG_RESERVA_EXCLUIDA);
 		}
 		return Constants.REDIRECT_PAGINA_MINHAS_RESERVAS;
@@ -153,8 +153,8 @@ public class DocenteController {
 				redirect.addFlashAttribute(Constants.ERRO, exception.getMessage());
 				return Constants.REDIRECT_PAGINA_MINHAS_RESERVAS;
 			}
-			reservaService.salvarHistorico(reserva, Acao.CANCELAMENTO, AutorAcao.PROFESSOR, motivo);
-			notificacaoService.notificar(reserva, Notificacao.RESERVA_CANCELADA, AutorAcao.PROFESSOR);
+			reservaService.salvarHistorico(reserva, Acao.CANCELAMENTO, professor.getUsuario().getNome(), motivo);
+			notificacaoService.notificar(reserva, Notificacao.RESERVA_CANCELADA, professor.getUsuario().getNome());
 			redirect.addFlashAttribute(Constants.INFO, Constants.MSG_RESERVA_CANCELADA);
 		}
 		return Constants.REDIRECT_PAGINA_MINHAS_RESERVAS;

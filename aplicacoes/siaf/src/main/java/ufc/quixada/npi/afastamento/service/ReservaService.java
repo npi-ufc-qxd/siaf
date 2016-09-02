@@ -3,7 +3,6 @@ package ufc.quixada.npi.afastamento.service;
 import java.util.List;
 
 import ufc.quixada.npi.afastamento.model.Acao;
-import ufc.quixada.npi.afastamento.model.AutorAcao;
 import ufc.quixada.npi.afastamento.model.Historico;
 import ufc.quixada.npi.afastamento.model.Periodo;
 import ufc.quixada.npi.afastamento.model.Professor;
@@ -15,7 +14,7 @@ public interface ReservaService {
 
 	void incluir(Reserva reserva, Professor professor) throws SiafException;
 	
-	void atualizar(Reserva reserva, Professor professor) throws SiafException;
+	void atualizar(Reserva reserva) throws SiafException;
 	
 	void excluir(Reserva reserva) throws SiafException;
 	
@@ -37,9 +36,9 @@ public interface ReservaService {
 	
 	List<Reserva> getReservasByStatusReservaAndProfessor(StatusReserva statusReserva, Professor professor);
 	
-	void salvarHistorico(Reserva reserva, Acao acao, AutorAcao autor, String comentario);
+	void salvarHistorico(Reserva reserva, Acao acao, String autor, String comentario);
 	
-	void salvarHistorico(Reserva reserva, Acao acao, AutorAcao autor);
+	void salvarHistorico(Reserva reserva, Acao acao, String autor);
 
 	Historico getUltimaAcao(Reserva reserva, Acao acao);
 }

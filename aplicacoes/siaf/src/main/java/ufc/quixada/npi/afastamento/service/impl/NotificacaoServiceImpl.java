@@ -16,7 +16,6 @@ import org.springframework.core.io.support.PropertiesLoaderUtils;
 import br.ufc.quixada.npi.model.Email;
 import br.ufc.quixada.npi.service.EmailService;
 import ufc.quixada.npi.afastamento.model.Acao;
-import ufc.quixada.npi.afastamento.model.AutorAcao;
 import ufc.quixada.npi.afastamento.model.Historico;
 import ufc.quixada.npi.afastamento.model.Notificacao;
 import ufc.quixada.npi.afastamento.model.Reserva;
@@ -61,7 +60,7 @@ public class NotificacaoServiceImpl implements NotificacaoService {
 	private String MOTIVO = "#MOTIVO#";
 	
 	@Override
-	public void notificar(Reserva res, Notificacao notificacao, AutorAcao autorAcao) {
+	public void notificar(Reserva res, Notificacao notificacao, String autorAcao) {
 		
 		Resource resource = new ClassPathResource("/email.properties");
 		try {
@@ -69,7 +68,7 @@ public class NotificacaoServiceImpl implements NotificacaoService {
 		
 			final Reserva reserva = res;
 			final Notificacao tipoNotificacao = notificacao;
-			final AutorAcao autor = autorAcao;
+			final String autor = autorAcao;
 	
 			if (properties.getProperty("email.ativo").equals("true")) {
 				
@@ -111,11 +110,7 @@ public class NotificacaoServiceImpl implements NotificacaoService {
 								} else {
 									texto = texto.replaceAll(INSTITUICAO, reserva.getInstituicao());
 								}
-								if(autor.equals(AutorAcao.PROFESSOR)) {
-									texto = texto.replaceAll(AUTOR, "Você");
-								} else {
-									texto = texto.replaceAll(AUTOR, "O Administrador do sistema");
-								}
+								texto = texto.replaceAll(AUTOR, autor);
 								email.setText(texto);
 								email.setTo(reserva.getProfessor().getUsuario().getEmail());
 								emailService.sendEmail(email);
@@ -131,11 +126,7 @@ public class NotificacaoServiceImpl implements NotificacaoService {
 								} else {
 									texto = texto.replaceAll(INSTITUICAO, reserva.getInstituicao());
 								}
-								if(autor.equals(AutorAcao.PROFESSOR)) {
-									texto = texto.replaceAll(AUTOR, "Você");
-								} else {
-									texto = texto.replaceAll(AUTOR, "O Administrador do sistema");
-								}
+								texto = texto.replaceAll(AUTOR, autor);
 								email.setText(texto);
 								email.setTo(reserva.getProfessor().getUsuario().getEmail());
 								emailService.sendEmail(email);
@@ -169,13 +160,7 @@ public class NotificacaoServiceImpl implements NotificacaoService {
 								} else {
 									texto = texto.replaceAll(INSTITUICAO, reserva.getInstituicao());
 								}
-								if(autor.equals(AutorAcao.PROFESSOR)) {
-									texto = texto.replaceAll(AUTOR, "Você");
-								} else if(autor.equals(AutorAcao.SISTEMA)) {
-									texto = texto.replaceAll(AUTOR, "O sistema");
-								} else {
-									texto = texto.replaceAll(AUTOR, "O Administrador do sistema");
-								}
+								texto = texto.replaceAll(AUTOR, autor);
 								email.setText(texto);
 								email.setTo(reserva.getProfessor().getUsuario().getEmail());
 								emailService.sendEmail(email);

@@ -8,7 +8,6 @@ import javax.inject.Named;
 
 import ufc.quixada.npi.afastamento.model.Acao;
 import ufc.quixada.npi.afastamento.model.Afastamento;
-import ufc.quixada.npi.afastamento.model.AutorAcao;
 import ufc.quixada.npi.afastamento.model.Historico;
 import ufc.quixada.npi.afastamento.model.Periodo;
 import ufc.quixada.npi.afastamento.model.Professor;
@@ -66,7 +65,7 @@ public class ReservaServiceImpl implements ReservaService {
 	}
 	
 	@Override
-	public void atualizar(Reserva reserva, Professor professor) throws SiafException {
+	public void atualizar(Reserva reserva) throws SiafException {
 		validaDadosReserva(reserva);
 		
 		if (!reserva.getStatus().equals(StatusReserva.EM_ESPERA)) {
@@ -143,12 +142,12 @@ public class ReservaServiceImpl implements ReservaService {
 	}
 
 	@Override
-	public void salvarHistorico(Reserva reserva, Acao acao, AutorAcao autor) {
+	public void salvarHistorico(Reserva reserva, Acao acao, String autor) {
 		this.salvarHistorico(reserva, acao, autor, null);
 	}
 	
 	@Override
-	public void salvarHistorico(Reserva reserva, Acao acao, AutorAcao autor, String comentario) {
+	public void salvarHistorico(Reserva reserva, Acao acao, String autor, String comentario) {
 		Historico historico = new Historico();
 		historico.setAcao(acao);
 		historico.setComentario(comentario);

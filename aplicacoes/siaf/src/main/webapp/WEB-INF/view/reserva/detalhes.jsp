@@ -65,31 +65,26 @@
 								</td>
 								<td>
 									<c:choose>
-										<c:when test="${historico.autor == 'SISTEMA' }"><c:set var="autor" value="O Sistema"></c:set></c:when>
-										<c:when test="${historico.autor == 'PROFESSOR' }"><c:set var="autor" value="${reserva.professor.usuario.nome }"></c:set> </c:when>
-										<c:when test="${historico.autor == 'ADMINISTRADOR' }"><c:set var="autor" value="O Administrador"></c:set> </c:when>
-									</c:choose>
-									<c:choose>
 										<c:when test="${historico.acao == 'CRIACAO' }">
-											${autor } criou a reserva.
+											${historico.autor } criou a reserva.
 										</c:when>
 										<c:when test="${historico.acao == 'EDICAO' }">
-											${autor } alterou a reserva.
+											${historico.autor } alterou a reserva.
 										</c:when>
 										<c:when test="${historico.acao == 'INCLUSAO_RANKING' }">
-											${autor } incluiu a reserva no ranking.
+											${historico.autor } incluiu a reserva no ranking.
 										</c:when>
 										<c:when test="${historico.acao == 'CANCELAMENTO' }">
-											${autor } cancelou a reserva. MOTIVO: ${historico.comentario }
+											${historico.autor } cancelou a reserva. MOTIVO: ${historico.comentario }
 										</c:when>
 										<c:when test="${historico.acao == 'CANCELAMENTO_COM_PUNICAO' }">
-											${autor } cancelou a reserva com punição. MOTIVO: ${historico.comentario }
+											${historico.autor } cancelou a reserva com punição. MOTIVO: ${historico.comentario }
 										</c:when>
 										<c:when test="${historico.acao == 'NEGACAO' }">
-											${autor } negou a solicitação da reserva. MOTIVO: ${historico.comentario }
+											${historico.autor } negou a solicitação da reserva. MOTIVO: ${historico.comentario }
 										</c:when>
 										<c:when test="${historico.acao == 'AFASTAMENTO' }">
-											${autor } confirmou o afastamento da reserva.
+											${historico.autor } confirmou o afastamento da reserva.
 										</c:when>
 										<c:when test="${historico.acao == 'NAO_ACEITACAO' }">
 											A reserva não foi classificada dentro das vagas no ranking.
