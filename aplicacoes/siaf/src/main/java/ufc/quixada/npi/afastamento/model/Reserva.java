@@ -12,6 +12,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -47,6 +48,7 @@ public class Reserva {
 	private StatusReserva status;
 	
 	@JsonIgnore
+	@OrderBy(value = "data")
 	@OneToMany(mappedBy = "reserva", cascade = CascadeType.REMOVE)
 	private List<Historico> historicos;
 
