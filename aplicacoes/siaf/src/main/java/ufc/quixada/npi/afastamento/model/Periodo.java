@@ -43,6 +43,16 @@ public class Periodo {
 	
 	@Enumerated(EnumType.STRING)
 	private StatusPeriodo status;
+	
+	public Periodo() {
+		
+	}
+	
+	public Periodo(Integer ano, Integer vagas, StatusPeriodo status) {
+		this.ano = ano;
+		this.vagas = vagas;
+		this.status = status;
+	}
 
 	public Long getId() {
 		return id;
