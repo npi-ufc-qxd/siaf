@@ -176,40 +176,22 @@ public class ReservaServiceImpl implements ReservaService {
 		int vagas = professorService.countAtivos();
 		
 		// Criar os períodos inexistentes
-		for (int ano = reserva.getAnoTermino(); ano >= reserva.getAnoInicio(); ano--) {
-			Periodo periodo = new Periodo();
-			periodo.setVagas((int) (vagas * 0.15));
-			periodo.setAno(ano);
-			periodo.setStatus(StatusPeriodo.ABERTO);
+		for (int ano = reserva.getAnoTermino(); ; ano--) {
+			Periodo periodo = new Periodo(ano, (int) (vagas * 0.15), StatusPeriodo.ABERTO);
 			
-			// Verifica se é o último período da reserva
-			if (ano == reserva.getAnoTermino()) {
-				if (reserva.getSemestreTermino() == 2) {
+			if (periodoService.getPeriodo(ano, 2) == null) {
+				if (ano != reserva.getAnoTermino() || (ano == reserva.getAnoTermino() && reserva.getSemestreTermino() == 2)) {
 					periodo.setSemestre(2);
 					periodoRepository.save(periodo);
 				}
-				periodo.setSemestre(1);
-				if (periodoService.getPeriodo(periodo.getAno(), periodo.getSemestre()) == null) {
-					periodoRepository.save(periodo);
-				} else {
-					break;
-				}
-				continue;
-			}
-			periodo.setSemestre(2);
-			if (periodoService.getPeriodo(periodo.getAno(), periodo.getSemestre()) == null) {
-				periodoRepository.save(periodo);
 			} else {
 				break;
 			}
-
-			periodo = new Periodo();
-			periodo.setAno(ano);
-			periodo.setSemestre(1);
-			periodo.setVagas((int) (vagas * 0.15));
-			periodo.setStatus(StatusPeriodo.ABERTO);
-			if (periodoService.getPeriodo(periodo.getAno(), periodo.getSemestre()) == null) {
+			if (periodoService.getPeriodo(ano, 1) == null) {
+				periodo = new Periodo(ano, (int) (vagas * 0.15), StatusPeriodo.ABERTO);
+				periodo.setSemestre(1);
 				periodoRepository.save(periodo);
+				continue;
 			} else {
 				break;
 			}
