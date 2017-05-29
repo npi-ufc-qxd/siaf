@@ -388,12 +388,9 @@ $(document).ready(function() {
 	// Página gerenciar períodos
 
 	$('#tablePeriodos').DataTable({
-		 "pageLength": 10,
-		 "order": [[ 1, 'asc' ], [ 2, 'asc' ]],
+		 "paging": false,
+		 "order": [[ 0, 'asc' ], [ 1, 'asc' ], [ 2, 'asc' ]],
 		 "columnDefs": [
-		               { "orderable": false, "targets": 0 },
-		               { "orderData": [ 1, 2 ],    "targets": 1 },
-		               { "orderable": false, "targets": 2 },
 		               { "orderable": false, "targets": 3 },
 		               { "orderable": false, "targets": 4 },
 		               { "orderable": false, "targets": 5 },
@@ -428,6 +425,7 @@ $(document).ready(function() {
 	$('.salvar-periodo').click(function(e){
 		e.preventDefault();
 		var id = $(this).data("id");
+		console.log(id);
 		$('#periodoId').val(id);
 		$('#encerramento').val($('#encerramento-' + id).val());
 		$('#vagas').val($('#vagas-' + id).val());
