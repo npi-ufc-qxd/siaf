@@ -27,7 +27,7 @@ public class RelatorioController {
 	public String getRelatorio(Model model) {
 		Periodo periodo = periodoService.getPeriodoAtual();
 		if (periodo != null) {
-			model.addAttribute("relatorio", rankingService.getRelatorio(periodo));
+			model.addAttribute("relatorio", rankingService.getMapaRanking(periodo));
 			model.addAttribute("periodos", periodoService.getPeriodoAbertos());
 			Periodo periodoAtual = periodoService.getPeriodoAtual();
 			model.addAttribute("periodoAtual", periodoAtual);

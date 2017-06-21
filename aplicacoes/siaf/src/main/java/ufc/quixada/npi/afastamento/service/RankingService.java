@@ -16,7 +16,7 @@ public interface RankingService {
 	
 	List<TuplaRanking> getTuplas(List<StatusReserva> status, Periodo periodo);
 	
-	Map<TuplaRanking, List<RelatorioPeriodo>> getRelatorio(Periodo periodo);
+	Map<TuplaRanking, List<RelatorioPeriodo>> getMapaRanking(Periodo periodo);
 	
 	Ranking getRankingHomologacao(Periodo periodo);
 }

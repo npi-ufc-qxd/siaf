@@ -69,6 +69,8 @@ public class ReservaController {
 
 		List<TuplaRanking> tuplas = new ArrayList<TuplaRanking>();
 		List<TuplaRanking> afastados = new ArrayList<TuplaRanking>();
+		
+		// Separa as reservas dos afastados e dos abertos
 		for (TuplaRanking tupla : ranking.getTuplas()) {
 			if (tupla.getReserva().getStatus().equals(StatusReserva.AFASTADO)) {
 				afastados.add(tupla);
@@ -76,6 +78,7 @@ public class ReservaController {
 				tuplas.add(tupla);
 			}
 		}
+		// Ordena os afastados por nome
 		Collections.sort(afastados, new Comparator<TuplaRanking>() {
 
 			@Override

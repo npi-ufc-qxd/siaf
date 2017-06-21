@@ -87,15 +87,11 @@ public class AdministracaoController {
 	
 	@RequestMapping(value = "/homologacao", method = RequestMethod.GET)
 	public String getHomologacao(Model model) {
-		Periodo periodo = periodoService.getPeriodoAtual();
-		if (periodo != null) {
-			periodo = periodoService.getPeriodoPosterior(periodo);
-			List<TuplaRanking> tuplasCanceladasNegadas = rankingService.getTuplas(
-					Arrays.asList(StatusReserva.CANCELADO, StatusReserva.CANCELADO_COM_PUNICAO, StatusReserva.NEGADO), periodo);
+		List<TuplaRanking> tuplasCanceladasNegadas = rankingService.getTuplas(
+				Arrays.asList(StatusReserva.CANCELADO, StatusReserva.CANCELADO_COM_PUNICAO, StatusReserva.NEGADO), periodoService.getProximoPeriodo());
 
-			model.addAttribute("tuplasCanceladasNegadas", tuplasCanceladasNegadas);
-			model.addAttribute("ranking", rankingService.getRankingHomologacao(periodo));
-		}
+		model.addAttribute("tuplasCanceladasNegadas", tuplasCanceladasNegadas);
+		model.addAttribute("ranking", rankingService.getRankingHomologacao(periodoService.getProximoPeriodo()));
 
 		return Constants.PAGINA_HOMOLOGAR_RESERVAS;
 	}

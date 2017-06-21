@@ -11,6 +11,8 @@ public interface PeriodoService {
 	
 	Periodo getPeriodoAtual();
 	
+	Periodo getProximoPeriodo();
+	
 	Periodo getPeriodoAnterior(Periodo periodo);
 	
 	Periodo getPeriodoPosterior(Periodo periodo);

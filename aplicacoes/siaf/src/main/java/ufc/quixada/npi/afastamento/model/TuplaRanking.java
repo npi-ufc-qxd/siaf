@@ -1,7 +1,5 @@
 package ufc.quixada.npi.afastamento.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 public class TuplaRanking {
 	
 	private String professor;
@@ -24,9 +22,6 @@ public class TuplaRanking {
 	private Float pontuacao;
 	
 	private StatusTupla status;
-	
-	@JsonIgnore
-	private Periodo periodo;
 	
 	private Reserva reserva;
 
@@ -70,14 +65,6 @@ public class TuplaRanking {
 		this.pontuacao = pontuacao;
 	}
 
-	public Periodo getPeriodo() {
-		return periodo;
-	}
-
-	public void setPeriodo(Periodo periodo) {
-		this.periodo = periodo;
-	}
-
 	public Reserva getReserva() {
 		return reserva;
 	}
@@ -114,7 +101,6 @@ public class TuplaRanking {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((periodo == null) ? 0 : periodo.hashCode());
 		result = prime * result + ((reserva == null) ? 0 : reserva.hashCode());
 		return result;
 	}
@@ -128,11 +114,6 @@ public class TuplaRanking {
 		if (getClass() != obj.getClass())
 			return false;
 		TuplaRanking other = (TuplaRanking) obj;
-		if (periodo == null) {
-			if (other.periodo != null)
-				return false;
-		} else if (!periodo.equals(other.periodo))
-			return false;
 		if (reserva == null) {
 			if (other.reserva != null)
 				return false;

@@ -66,6 +66,11 @@ public class PeriodoServiceImpl implements PeriodoService {
 	public Periodo getPeriodoAtual() {
 		return periodoRepository.findFirstByStatusOrderByAnoAscSemestreAsc(StatusPeriodo.ABERTO);
 	}
+	
+	@Override
+	public Periodo getProximoPeriodo() {
+		return getPeriodoPosterior(getPeriodoAtual());
+	}
 
 	@Override
 	public List<Periodo> getPeriodosPosteriores(Periodo periodo) {

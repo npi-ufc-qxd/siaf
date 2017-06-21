@@ -41,7 +41,7 @@ public class RankingServiceImpl implements RankingService {
 	
 	
 	@Override
-	public Map<TuplaRanking, List<RelatorioPeriodo>> getRelatorio(Periodo periodo) {
+	public Map<TuplaRanking, List<RelatorioPeriodo>> getMapaRanking(Periodo periodo) {
 		List<Periodo> periodos = periodoService.getPeriodoAbertos();
 		Map<Periodo, List<TuplaRanking>> rankings = new HashMap<Periodo, List<TuplaRanking>>();
 		Map<TuplaRanking, List<RelatorioPeriodo>> relatorio = new HashMap<TuplaRanking, List<RelatorioPeriodo>>();
@@ -160,61 +160,75 @@ public class RankingServiceImpl implements RankingService {
 	}
 
 	@Override
-	public List<TuplaRanking> getRanking(Periodo periodo, boolean simulador) {
+	public List<TuplaRanking> getRanking(Periodo periodo, boolean previa) {
+		// Busca os períodos que estão em aberto e cria uma lista de reservas para cada período
 		List<Periodo> periodos = periodoService.getPeriodoAbertos();
 		Map<Periodo, List<TuplaRanking>> rankings = new HashMap<Periodo, List<TuplaRanking>>();
 		for (Periodo p : periodos) {
 			rankings.put(p, new ArrayList<TuplaRanking>());
 		}
 
+		// Busca as reservas em aberto e afastados para calcular o ranking e subtrarir as vagas dos afastados
 		List<Reserva> reservas = new ArrayList<Reserva>();
 		List<Reserva> reservasEmAberto = reservaService.getReservasByStatus(StatusReserva.ABERTO);
 		reservas.addAll(reservasEmAberto);
 		reservas.addAll(reservaService.getReservasByStatus(StatusReserva.AFASTADO));
-		if(simulador) {
+		
+		// Cada reserva se torna uma tupla. Essa tupla possui a reserva e a referida pontuação
+		List<TuplaRanking> tuplas = new ArrayList<TuplaRanking>(calculaPontuacao(reservas, periodo));
+
+		// Ordena todas as tuplas (reservas) de acordo com a pontuação e os critérios de desempate
+		ordenaTuplas(tuplas);
+
+		// Define se a reserva está classificada ou não de acordo com a pontuação e o número de vagas
+		geraClassificaao(tuplas, rankings);
+		
+		// Se for a prévia do ranking
+		if (previa) {
+			// Busca as reservas em espera e substitui as que estiverem no ranking da mesma pessoa
 			List<Reserva> reservasEmEspera = reservaService.getReservasByStatus(StatusReserva.EM_ESPERA);
 			reservas.addAll(reservasEmEspera);
+			Periodo proximoPeriodo = periodoService.getProximoPeriodo();
 			for (Reserva reservaEspera : reservasEmEspera) {
 				for (Reserva reservaAberta : reservasEmAberto) {
-					if (reservaAberta.getProfessor().equals(reservaEspera.getProfessor())) {
-						reservas.remove(reservaAberta);
+					if (reservaAberta.getProfessor().equals(reservaEspera.getProfessor())
+							&& reservaAberta.getAnoInicio().equals(proximoPeriodo.getAno()) && reservaAberta.getSemestreInicio().equals(proximoPeriodo.getSemestre())) {
+						reservas.remove(reservaEspera);
 					}
 				}
 			}
+			
+			tuplas = new ArrayList<TuplaRanking>(calculaPontuacao(reservas, periodo));
+						
+			List<TuplaRanking> tuplasPeriodo = rankings.get(periodoService.getProximoPeriodo());
+			for (TuplaRanking t : tuplasPeriodo) {
+				if (tuplas.contains(t)) {
+					TuplaRanking tupla = tuplas.get(tuplas.indexOf(t));
+					tuplas.remove(tupla);
+					if (StatusTupla.CLASSIFICADO.equals(t.getStatus())) {
+						tupla.getReserva().setStatus(StatusReserva.AFASTADO);
+					} else if (StatusTupla.DESCLASSIFICADO.equals(t.getStatus())) {
+						tupla.getReserva().setStatus(StatusReserva.NAO_ACEITO);
+					}
+					tuplas.add(tupla);
+				}
+			}
+			
+			rankings = new HashMap<Periodo, List<TuplaRanking>>();
+			for (Periodo p : periodos) {
+				rankings.put(p, new ArrayList<TuplaRanking>());
+			}
+			ordenaTuplas(tuplas);
+			geraClassificaao(tuplas, rankings);
 		}
+				
 
-		List<TuplaRanking> tuplas = new ArrayList<TuplaRanking>();
-		tuplas.addAll(calculaPontuacao(reservas, periodo));
-
-		Collections.sort(tuplas, new Comparator<TuplaRanking>() {
-			@Override
-			public int compare(TuplaRanking tupla1, TuplaRanking tupla2) {
-				if (tupla1.getPontuacao().compareTo(tupla2.getPontuacao()) == 0.0f) {
-					if (tupla1.getReserva().getPrograma().equals(tupla2.getReserva().getPrograma())) {
-						if (tupla1.getReserva().getConceitoPrograma().equals(tupla2.getReserva().getConceitoPrograma())) {
-							return tupla1.getReserva().getProfessor().getUsuario().getNascimento()
-									.compareTo(tupla2.getReserva().getProfessor().getUsuario().getNascimento());
-						}
-						return tupla2.getReserva().getConceitoPrograma().compareTo(tupla1.getReserva().getConceitoPrograma());
-					}
-					if (tupla1.getReserva().getPrograma().equals(Programa.MESTRADO)) {
-						return -1;
-					}
-					if (tupla2.getReserva().getPrograma().equals(Programa.MESTRADO)) {
-						return 1;
-					}
-					if (tupla1.getReserva().getPrograma().equals(Programa.DOUTORADO)) {
-						return -1;
-					}
-					if (tupla2.getReserva().getPrograma().equals(Programa.DOUTORADO)) {
-						return 1;
-					}
-				}
-				return tupla2.getPontuacao().compareTo(tupla1.getPontuacao());
-			}
-		});
-
-		// Coloca primeiramente nos períodos os que já estão afastados
+		// Retorna apenas as tuplas do período requisitado
+		return rankings.get(periodo);
+	}
+	
+	private void geraClassificaao(List<TuplaRanking> tuplas, Map<Periodo, List<TuplaRanking>> rankings) {
+		// Coloca primeiramente nos períodos os que já estão afastados para subtrair as vagas
 		for (TuplaRanking tupla : tuplas) {
 			if (tupla.getReserva().getStatus().equals(StatusReserva.AFASTADO)) {
 				Periodo periodoInicio = periodoService
@@ -232,7 +246,8 @@ public class RankingServiceImpl implements RankingService {
 				}
 			}
 		}
-
+				
+		// Gera a classificação de acordo com a pontuação e o número de vagas em cada período
 		for (TuplaRanking tupla : tuplas) {
 			if (!tupla.getReserva().getStatus().equals(StatusReserva.AFASTADO)) {
 				boolean classificado = true;
@@ -266,8 +281,36 @@ public class RankingServiceImpl implements RankingService {
 				}
 			}
 		}
-
-		return rankings.get(periodo);
+	}
+	
+	private void ordenaTuplas(List<TuplaRanking> tuplas) {
+		Collections.sort(tuplas, new Comparator<TuplaRanking>() {
+			@Override
+			public int compare(TuplaRanking tupla1, TuplaRanking tupla2) {
+				if (tupla1.getPontuacao().compareTo(tupla2.getPontuacao()) == 0.0f) {
+					if (tupla1.getReserva().getPrograma().equals(tupla2.getReserva().getPrograma())) {
+						if (tupla1.getReserva().getConceitoPrograma().equals(tupla2.getReserva().getConceitoPrograma())) {
+							return tupla1.getReserva().getProfessor().getUsuario().getNascimento()
+									.compareTo(tupla2.getReserva().getProfessor().getUsuario().getNascimento());
+						}
+						return tupla2.getReserva().getConceitoPrograma().compareTo(tupla1.getReserva().getConceitoPrograma());
+					}
+					if (tupla1.getReserva().getPrograma().equals(Programa.MESTRADO)) {
+						return -1;
+					}
+					if (tupla2.getReserva().getPrograma().equals(Programa.MESTRADO)) {
+						return 1;
+					}
+					if (tupla1.getReserva().getPrograma().equals(Programa.DOUTORADO)) {
+						return -1;
+					}
+					if (tupla2.getReserva().getPrograma().equals(Programa.DOUTORADO)) {
+						return 1;
+					}
+				}
+				return tupla2.getPontuacao().compareTo(tupla1.getPontuacao());
+			}
+		});
 	}
 
 	@Override
@@ -281,7 +324,7 @@ public class RankingServiceImpl implements RankingService {
 				TuplaRanking tupla = new TuplaRanking();
 				tupla.setReserva(reserva);
 				tupla.setProfessor(reserva.getProfessor().getUsuario().getNome());
-				tupla.setPeriodo(periodo);
+				//tupla.setPeriodo(periodo);
 				if (StatusReserva.CANCELADO.equals(statusReserva))
 					tupla.setStatus(StatusTupla.CANCELADO);
 				else if (StatusReserva.NEGADO.equals(statusReserva))
@@ -301,7 +344,7 @@ public class RankingServiceImpl implements RankingService {
 		for (Reserva reserva : reservas) {
 			TuplaRanking tupla = new TuplaRanking();
 			tupla.setReserva(reserva);
-			tupla.setPeriodo(periodo);
+			//tupla.setPeriodo(periodo);
 			tupla.setProfessor(reserva.getProfessor().getUsuario().getNome());
 			tupla.setSs(getSemestresSolicitados(reserva));
 			tupla.setT(calculaSemestres(reserva.getProfessor().getAnoAdmissao(), reserva.getProfessor().getSemestreAdmissao(),
