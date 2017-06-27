@@ -15,5 +15,6 @@ public enum StatusTupla {
 	public String getDescricao() {
 		return this.descricao;
 	}
+	
 
 }

@@ -200,13 +200,14 @@ public class RankingServiceImpl implements RankingService {
 			
 			tuplas = new ArrayList<TuplaRanking>(calculaPontuacao(reservas, periodo));
 						
+			// Busca as reservas que estão classificadas para o próximo período e coloca como aptos para afastamento.
 			List<TuplaRanking> tuplasPeriodo = rankings.get(periodoService.getProximoPeriodo());
 			for (TuplaRanking t : tuplasPeriodo) {
 				if (tuplas.contains(t)) {
 					TuplaRanking tupla = tuplas.get(tuplas.indexOf(t));
 					tuplas.remove(tupla);
 					if (StatusTupla.CLASSIFICADO.equals(t.getStatus())) {
-						tupla.getReserva().setStatus(StatusReserva.AFASTADO);
+						tupla.getReserva().setStatus(StatusReserva.APTO_AFASTAMENTO);
 					} else if (StatusTupla.DESCLASSIFICADO.equals(t.getStatus())) {
 						tupla.getReserva().setStatus(StatusReserva.NAO_ACEITO);
 					}
@@ -230,7 +231,7 @@ public class RankingServiceImpl implements RankingService {
 	private void geraClassificaao(List<TuplaRanking> tuplas, Map<Periodo, List<TuplaRanking>> rankings) {
 		// Coloca primeiramente nos períodos os que já estão afastados para subtrair as vagas
 		for (TuplaRanking tupla : tuplas) {
-			if (tupla.getReserva().getStatus().equals(StatusReserva.AFASTADO)) {
+			if (tupla.getReserva().getStatus().equals(StatusReserva.AFASTADO) || tupla.getReserva().getStatus().equals(StatusReserva.APTO_AFASTAMENTO)) {
 				Periodo periodoInicio = periodoService
 						.getPeriodo(tupla.getReserva().getAnoInicio(), tupla.getReserva().getSemestreInicio());
 				Periodo periodoTermino = periodoService.getPeriodo(tupla.getReserva().getAnoTermino(), tupla.getReserva()
@@ -238,7 +239,7 @@ public class RankingServiceImpl implements RankingService {
 				for (; periodoInicio != null && !periodoInicio.equals(periodoService.getPeriodoPosterior(periodoTermino)); periodoInicio = periodoService
 						.getPeriodoPosterior(periodoInicio)) {
 					if (rankings.containsKey(periodoInicio)) {
-						tupla.setStatus(StatusTupla.AFASTADO);
+						tupla.setStatus(tupla.getReserva().getStatus().equals(StatusReserva.AFASTADO) ? StatusTupla.AFASTADO : StatusTupla.APTO_AFASTAMENTO);
 						List<TuplaRanking> tuplaPeriodo = rankings.get(periodoInicio);
 						tuplaPeriodo.add(tupla);
 						rankings.put(periodoInicio, tuplaPeriodo);
@@ -249,7 +250,7 @@ public class RankingServiceImpl implements RankingService {
 				
 		// Gera a classificação de acordo com a pontuação e o número de vagas em cada período
 		for (TuplaRanking tupla : tuplas) {
-			if (!tupla.getReserva().getStatus().equals(StatusReserva.AFASTADO)) {
+			if (!tupla.getReserva().getStatus().equals(StatusReserva.AFASTADO) && !tupla.getReserva().getStatus().equals(StatusReserva.APTO_AFASTAMENTO)) {
 				boolean classificado = true;
 				Periodo periodoInicio = periodoService
 						.getPeriodo(tupla.getReserva().getAnoInicio(), tupla.getReserva().getSemestreInicio());
@@ -259,7 +260,8 @@ public class RankingServiceImpl implements RankingService {
 						.getPeriodoPosterior(periodoInicio)) {
 					int vagas = periodoInicio.getVagas();
 					for (TuplaRanking t : rankings.get(periodoInicio)) {
-						if (t.getStatus().equals(StatusTupla.AFASTADO) || t.getStatus().equals(StatusTupla.CLASSIFICADO)) {
+						if (t.getStatus().equals(StatusTupla.AFASTADO) || t.getStatus().equals(StatusTupla.APTO_AFASTAMENTO)
+								|| t.getStatus().equals(StatusTupla.CLASSIFICADO)) {
 							vagas--;
 						}
 					}

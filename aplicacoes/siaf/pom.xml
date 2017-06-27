@@ -4,7 +4,7 @@
 	<groupId>quixada.ufc.br</groupId>
 	<artifactId>siaf</artifactId>
 	<packaging>war</packaging>
-	<version>1.1</version>
+	<version>1.2</version>
 	<name>Siaf</name>
 	<url>http://maven.apache.org</url>
 

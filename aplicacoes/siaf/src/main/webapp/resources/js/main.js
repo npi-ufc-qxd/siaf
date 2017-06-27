@@ -457,7 +457,7 @@ function getRanking(ano, semestre, simulador) {
 		}
 	})
 	.success(function(result) {
-		$('#count-ranking').text('Estimativa de vagas restantes: ' + (result.periodoAtual.vagas - result.afastados.length));
+		$('#count-ranking').text('Vagas restantes: ' + (result.periodoAtual.vagas - result.afastados.length));
 		loadAfastados(result.afastados);
 			
 		$('i#anterior, i#anterior-simulador').show();
@@ -535,11 +535,11 @@ function loadRanking(result) {
 }
 
 function loadAfastados(afastados) {
-	$('#count-afastados').text('Quantidade de professores afastados: ' + afastados.length);
+	$('#count-afastados').text('Vagas ocupadas: ' + afastados.length);
 	$("#afastados tbody").remove();
 	$('#afastados').append('<tbody>');
 	$.each(afastados, function(i, tupla) {
-        var $tr = $('<tr>').append(
+        var $tr = $('<tr class=\"' + tupla.reserva.status + '\">').append(
         	$('<td>').text(tupla.professor),
             $('<td class=\"align-center\">').text(tupla.reserva.anoInicio + "." + tupla.reserva.semestreInicio + " a " + tupla.reserva.anoTermino + "." + tupla.reserva.semestreTermino),
             $('<td class=\"align-center\">').text(getPrograma(tupla.reserva.programa))
@@ -568,6 +568,8 @@ function getStatus(reserva) {
 		return "NÃO ACEITO";
 	} else if(reserva == 'CANCELADO_COM_PUNICAO') {
 		return "CANCELADO COM PUNIÇÃO";
+	} else if(reserva == 'APTO_AFASTAMENTO') {
+		return "EM PROCESSO DE AFASTAMENTO";
 	}
 	return reserva;
 }

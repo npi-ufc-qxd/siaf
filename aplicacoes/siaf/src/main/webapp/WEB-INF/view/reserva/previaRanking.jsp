@@ -70,7 +70,7 @@
 				
 				<div class="titulo-ranking title" role="navigation">
 					<a data-toggle="collapse" href="#collapseRanking"
-						aria-controls="#collapseRanking">Prévia do Ranking</a><br> <span
+						aria-controls="#collapseRanking">Prévia - Solicitações de Reserva</a><br> <span
 						id="count-ranking" class="badge"></span>
 				</div>
 				
@@ -105,11 +105,13 @@
 				
 				<div class="titulo-ranking title">
 					<a data-toggle="collapse" href="#collapseAfastados" aria-expanded="false" aria-controls="#collapseAfastados">
-						Professores Afastados</a><br>
+						Prévia - Afastamentos/Em Processo de Afastamento</a><br>
 					<span id="count-afastados" class="badge"></span>
 				</div>
 
 				<div class="collapse in" id="collapseAfastados">
+					<label><span class="afastado">&nbsp;&nbsp;&nbsp;&nbsp;</span>&nbsp;Afastado</label>
+					<label><span class="classificado">&nbsp;&nbsp;&nbsp;&nbsp;</span>&nbsp;Em processo de afastamento</label><br>
 					<table id="afastados" class="table">
 						<thead>
 							<tr>

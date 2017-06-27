@@ -72,7 +72,7 @@ public class ReservaController {
 		
 		// Separa as reservas dos afastados e dos abertos
 		for (TuplaRanking tupla : ranking.getTuplas()) {
-			if (tupla.getReserva().getStatus().equals(StatusReserva.AFASTADO)) {
+			if (tupla.getReserva().getStatus().equals(StatusReserva.AFASTADO) || tupla.getReserva().getStatus().equals(StatusReserva.APTO_AFASTAMENTO)) {
 				afastados.add(tupla);
 			} else {
 				tuplas.add(tupla);

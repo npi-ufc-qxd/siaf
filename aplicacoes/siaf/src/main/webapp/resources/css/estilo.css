@@ -160,7 +160,7 @@ div.titulo-ranking a {
 	letter-spacing: 1px;;
 }
 
-#collapseRanking > label {
+#collapseRanking > label, #collapseAfastados > label {
 	margin-top: 15px;
 }
 
@@ -212,7 +212,7 @@ table > tbody > tr.ENCERRADO {
 	background-color: #C5C5C5;
 }
 
-table > tbody > tr.CLASSIFICADO {
+table > tbody > tr.CLASSIFICADO, table > tbody > tr.APTO_AFASTAMENTO {
 	background-color: #95CF9E !important;
 }
 
@@ -242,7 +242,7 @@ div#legenda label span {
 	font-weight: bold;
 }
 
-div#legenda label span.afastado {
+div#legenda label span.afastado, label span.afastado {
 	background-color: #BBD4E1;
 }
 
