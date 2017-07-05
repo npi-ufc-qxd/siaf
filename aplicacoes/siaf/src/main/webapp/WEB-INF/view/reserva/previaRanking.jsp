@@ -146,7 +146,7 @@
 						semestre, para efeito de cálculo da ordem de prioridade das
 						reservas/solicitações, a solicitação cancelada de acordo com os
 						critérios da <a
-						href="<c:url value="/resources/files/Resolucaoo_01-2014.pdf" />">resolução</a>.</label><br>
+						href="<c:url value="/resources/files/Resolucao_01-2014.pdf" />">resolução</a>.</label><br>
 					<br> <label>Em caso de empate na ordem de prioridade,
 						serão considerados os critérios abaixo, na ordem indicada:</label> <label><span>I:</span>
 						Mestrado tem maior prioridade que doutorado, e doutorado tem maior
